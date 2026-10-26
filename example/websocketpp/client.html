@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Websocket</title>
+</head>
+<body>
+    <!-- 输入消息后点击提交，通过 WebSocket 发送给服务器。 -->
+    <input type="text" id="message">
+    <button id="submit">提交</button>
+
+    <script>
+        // 连接本机 8888 端口；跨机器访问时，将地址改为服务端的实际地址。
+        let websocket = new WebSocket("ws://127.0.0.1:8888");
+
+        // 握手完成后，在浏览器控制台输出连接建立提示。
+        websocket.onopen = function () {
+            console.log("连接建立");
+        };
+
+        // 服务器发回消息时，读取事件中的 data 并输出消息正文。
+        websocket.onmessage = function (e) {
+            console.log("收到消息: " + e.data);
+        };
+
+        // 连接发生错误时，在浏览器控制台输出异常提示。
+        websocket.onerror = function () {
+            console.log("连接异常");
+        };
+
+        // 连接关闭后，在浏览器控制台输出关闭提示。
+        websocket.onclose = function () {
+            console.log("连接关闭");
+        };
+
+        // 取得输入框和按钮，供点击回调读取输入内容。
+        let input = document.querySelector("#message");
+        let button = document.querySelector("#submit");
+
+        // 点击提交时，将输入框中的文本发送到已建立的 WebSocket 连接。
+        button.onclick = function () {
+            console.log("发送消息: " + input.value);
+            websocket.send(input.value);
+        };
+    </script>
+</body>
+</html>

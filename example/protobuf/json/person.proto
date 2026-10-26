@@ -1,0 +1,11 @@
+syntax = "proto3";
+package example;
+
+// optional 记录字段的设置状态，使显式设置的零值能够保留在 JSON 中。
+message Person {
+  optional string    name   = 1;
+  optional int32     age    = 2;
+  optional string    email  = 3;
+  repeated string    skills = 4;
+  map<string, float> scores = 5;
+}

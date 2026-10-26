@@ -1,8 +1,5 @@
 <div align="center">
 
-
-<div align="center">
-
 ---
 
 ## Overview
@@ -24,22 +21,22 @@
 
 ## Tech Stack
 
-| Category                          | Technologies      | 说明                                          |
-| --------------------------------- | ----------------- | --------------------------------------------- |
-| Configuration（配置管理）         | gflags            | 命令行参数解析与程序配置管理                  |
-| Logging（日志管理）               | spdlog            | 高性能日志记录与输出                          |
-| Testing（单元测试）               | Google Test       | C++ 单元测试与自动化测试框架                  |
-| Serialization（序列化）           | JsonCpp, Protobuf | JSON 与 Protocol Buffers 数据序列化及反序列化 |
-| HTTP（HTTP 通信）                 | cpp-httplib       | HTTP 客户端与服务器开发                       |
-| WebSocket（实时通信）             | WebSocket++       | WebSocket 客户端与服务器开发                  |
-| RPC（远程过程调用）               | brpc              | 高性能 RPC 客户端与服务器开发                 |
-| Multimedia（多媒体处理）          | FFmpeg            | 音视频编解码、格式转换与媒体处理              |
-| Database（数据库）                | MySQL, Redis      | 关系型数据存储与高性能键值存储                |
-| Message Queue（消息队列）         | RabbitMQ          | 异步消息传递、任务队列与服务解耦              |
-| Service Coordination（服务协调）  | etcd              | 分布式键值存储、服务发现与配置管理            |
-| Distributed Storage（分布式存储） | FastDFS           | 分布式文件存储与管理                          |
-| Search Engine（搜索引擎）         | Elasticsearch     | 全文检索、数据索引与搜索分析                  |
-| Cloud Services（云服务）          | Alibaba Cloud SMS | 阿里云短信发送与短信服务集成                  |
+| Category（分类）                  | Technologies（技术组件） | 中文说明                                      |
+| --------------------------------- | ------------------------ | --------------------------------------------- |
+| Configuration（配置管理）         | gflags                   | 命令行参数解析与程序配置管理                  |
+| Logging（日志管理）               | spdlog                   | 高性能日志记录与输出                          |
+| Testing（单元测试）               | Google Test              | C++ 单元测试与自动化测试框架                  |
+| Serialization（序列化）           | JsonCpp, Protobuf        | JSON 与 Protocol Buffers 数据序列化及反序列化 |
+| HTTP（HTTP 通信）                 | cpp-httplib              | HTTP 客户端与服务器开发                       |
+| WebSocket（实时通信）             | WebSocket++              | WebSocket 客户端与服务器开发                  |
+| RPC（远程过程调用）               | brpc                     | 高性能 RPC 客户端与服务器开发                 |
+| Multimedia（多媒体处理）          | FFmpeg                   | 音视频编解码、格式转换与媒体处理              |
+| Database（数据库）                | MySQL, Redis             | 关系型数据存储与高性能键值存储                |
+| Message Queue（消息队列）         | RabbitMQ                 | 异步消息传递、任务队列与服务解耦              |
+| Service Coordination（服务协调）  | etcd                     | 分布式键值存储、服务发现与配置管理            |
+| Distributed Storage（分布式存储） | FastDFS                  | 分布式文件存储与管理                          |
+| Search Engine（搜索引擎）         | Elasticsearch            | 全文检索、数据索引与搜索分析                  |
+| Cloud Services（云服务）          | Alibaba Cloud SMS        | 阿里云短信发送与短信服务集成                  |
 
 ## Quick Start
 

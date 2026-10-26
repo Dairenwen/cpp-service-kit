@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 150px;
+        }
+
+        .logo {
+            font-size: 5rem;
+            font-weight: normal;
+            margin-bottom: 30px;
+        }
+
+        .g-blue {
+            color: #4285f4;
+        }
+
+        .g-red {
+            color: #ea4335;
+        }
+
+        .g-yellow {
+            color: #fbbc05;
+        }
+
+        .g-green {
+            color: #34a853;
+        }
+
+        .search-box {
+            width: 90%;
+            max-width: 580px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #dcdcdc;
+            border-radius: 24px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .search-input:hover,
+        .search-input:focus {
+            box-shadow: 0 1px 6px rgba(32, 33, 36, .28);
+            border-color: rgba(223, 225, 229, 0);
+        }
+
+        .btns {
+            margin-top: 28px;
+            display: flex;
+            gap: 12px;
+        }
+
+        button {
+            padding: 10px 16px;
+            background: #f8f9fa;
+            border: 1px solid #f8f9fa;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            border: 1px solid #dadce0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="logo">
+        <span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span
+            class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span>
+    </div>
+    <div class="search-box">
+        <input type="text" class="search-input" placeholder="搜索">
+    </div>
+    <div class="btns">
+        <button>Google 搜索</button>
+        <button>手气不错</button>
+    </div>
+</body>
+
+</html>
