@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Websocket</title>
 </head>
+
 <body>
     <!-- 输入消息后点击提交，通过 WebSocket 发送给服务器。 -->
     <input type="text" id="message">
@@ -13,7 +15,7 @@
 
     <script>
         // 连接本机 8888 端口；跨机器访问时，将地址改为服务端的实际地址。
-        let websocket = new WebSocket("ws://127.0.0.1:8888");
+        let websocket = new WebSocket("ws://127.0.0.1:8888");// 使用http协议的ws://，如果是https协议则使用wss://
 
         // 握手完成后，在浏览器控制台输出连接建立提示。
         websocket.onopen = function () {
@@ -46,4 +48,5 @@
         };
     </script>
 </body>
+
 </html>

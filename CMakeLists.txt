@@ -12,6 +12,11 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(jsoncpp CONFIG REQUIRED)
 find_package(Protobuf 3.12 REQUIRED)
 find_path(HTTPLIB_INCLUDE_DIR httplib.h REQUIRED)
+find_path(BRPC_INCLUDE_DIR brpc/server.h REQUIRED)
+find_library(BRPC_LIBRARY NAMES brpc REQUIRED)
+find_library(LEVELDB_LIBRARY NAMES leveldb REQUIRED)
+find_package(OpenSSL REQUIRED)
+find_package(ZLIB REQUIRED)
 # WebSocketpp 使用 Boost.Asio 处理网络事件，并链接 Boost.System。
 find_package(Boost REQUIRED COMPONENTS system)
 find_path(WEBSOCKETPP_INCLUDE_DIR websocketpp/server.hpp REQUIRED)
@@ -167,6 +172,49 @@ configure_file(
     example/websocketpp/client.html
     bin/websocketpp_client.html
     COPYONLY
+)
+
+# ---------- brpc：加法服务端和客户端 ----------
+
+
+# 将 cal.proto 生成的 C++ 文件保存到 build/generated/brpc。
+set(BRPC_PROTO_DIR "${CMAKE_BINARY_DIR}/generated/brpc")
+file(MAKE_DIRECTORY "${BRPC_PROTO_DIR}")
+add_custom_command(
+    OUTPUT
+        "${BRPC_PROTO_DIR}/cal.pb.cc"
+        "${BRPC_PROTO_DIR}/cal.pb.h"
+    COMMAND protobuf::protoc
+        "--cpp_out=${BRPC_PROTO_DIR}"
+        "--proto_path=${CMAKE_CURRENT_SOURCE_DIR}/example/brpc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/example/brpc/cal.proto"
+    DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/example/brpc/cal.proto"
+        protobuf::protoc
+    VERBATIM
+)
+
+# 协议代码编译一次，供服务端和客户端共同使用
+add_library(brpc_proto STATIC "${BRPC_PROTO_DIR}/cal.pb.cc")
+target_include_directories(brpc_proto PUBLIC "${BRPC_PROTO_DIR}")
+target_link_libraries(brpc_proto PUBLIC protobuf::libprotobuf)
+
+# 编译 example/brpc/server.cpp，生成 build/bin/brpc_server
+add_executable(brpc_server example/brpc/server.cpp)
+target_include_directories(brpc_server PRIVATE "${BRPC_INCLUDE_DIR}")
+target_link_libraries(brpc_server PRIVATE
+    brpc_proto "${BRPC_LIBRARY}" protobuf::libprotobuf gflags
+    "${LEVELDB_LIBRARY}" OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB
+    Threads::Threads ${CMAKE_DL_LIBS}
+)
+
+# 编译 example/brpc/client.cpp，生成 build/bin/brpc_client
+add_executable(brpc_client example/brpc/client.cpp)
+target_include_directories(brpc_client PRIVATE "${BRPC_INCLUDE_DIR}")
+target_link_libraries(brpc_client PRIVATE
+    brpc_proto "${BRPC_LIBRARY}" protobuf::libprotobuf gflags
+    "${LEVELDB_LIBRARY}" OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB
+    Threads::Threads ${CMAKE_DL_LIBS}
 )
 
 

@@ -1,0 +1,17 @@
+syntax = "proto3";
+package cal;
+option cc_generic_services = true; //开启Rpc时需要开启
+
+message AddReq {
+  int32 num1 = 1;
+  int32 num2 = 2;
+};
+
+message AddRsp {
+  int32 result = 1;
+};
+
+//service表示一个Rpc服务
+service CalService {
+  rpc Add(AddReq) returns (AddRsp);// 表示Add方法的请求参数是AddReq，返回参数是AddRsp
+};
