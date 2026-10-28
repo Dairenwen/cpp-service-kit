@@ -23,6 +23,10 @@ class AddRspDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<AddRsp> _instance;
 } _AddRsp_default_instance_;
+class PersonRspDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<PersonRsp> _instance;
+} _PersonRsp_default_instance_;
 }  // namespace cal
 static void InitDefaultsscc_info_AddReq_cal_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -52,7 +56,21 @@ static void InitDefaultsscc_info_AddRsp_cal_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_AddRsp_cal_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_AddRsp_cal_2eproto}, {}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_cal_2eproto[2];
+static void InitDefaultsscc_info_PersonRsp_cal_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::cal::_PersonRsp_default_instance_;
+    new (ptr) ::cal::PersonRsp();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::cal::PersonRsp::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PersonRsp_cal_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_PersonRsp_cal_2eproto}, {}};
+
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_cal_2eproto[3];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_cal_2eproto = nullptr;
 static const ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor* file_level_service_descriptors_cal_2eproto[1];
 
@@ -70,35 +88,50 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_cal_2eproto::offsets[] PROTOBU
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::cal::AddRsp, result_),
+  PROTOBUF_FIELD_OFFSET(::cal::PersonRsp, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::cal::PersonRsp, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::cal::PersonRsp, rid_),
+  PROTOBUF_FIELD_OFFSET(::cal::PersonRsp, msg_),
+  0,
+  1,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::cal::AddReq)},
   { 7, -1, sizeof(::cal::AddRsp)},
+  { 13, 20, sizeof(::cal::PersonRsp)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::cal::_AddReq_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::cal::_AddRsp_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::cal::_PersonRsp_default_instance_),
 };
 
 const char descriptor_table_protodef_cal_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\tcal.proto\022\003cal\"$\n\006AddReq\022\014\n\004num1\030\001 \001(\005"
   "\022\014\n\004num2\030\002 \001(\005\"\030\n\006AddRsp\022\016\n\006result\030\001 \001(\005"
-  "2-\n\nCalService\022\037\n\003Add\022\013.cal.AddReq\032\013.cal"
-  ".AddRspB\003\200\001\001b\006proto3"
+  "\"\?\n\tPersonRsp\022\020\n\003rid\030\001 \001(\tH\000\210\001\001\022\020\n\003msg\030\002"
+  " \001(\tH\001\210\001\001B\006\n\004_ridB\006\n\004_msg2\\\n\nCalService\022"
+  "\037\n\003Add\022\013.cal.AddReq\032\013.cal.AddRsp\022-\n\013Pers"
+  "onHello\022\016.cal.PersonRsp\032\016.cal.PersonRspB"
+  "\003\200\001\001b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_cal_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_cal_2eproto_sccs[2] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_cal_2eproto_sccs[3] = {
   &scc_info_AddReq_cal_2eproto.base,
   &scc_info_AddRsp_cal_2eproto.base,
+  &scc_info_PersonRsp_cal_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_cal_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_cal_2eproto = {
-  false, false, descriptor_table_protodef_cal_2eproto, "cal.proto", 140,
-  &descriptor_table_cal_2eproto_once, descriptor_table_cal_2eproto_sccs, descriptor_table_cal_2eproto_deps, 2, 0,
+  false, false, descriptor_table_protodef_cal_2eproto, "cal.proto", 252,
+  &descriptor_table_cal_2eproto_once, descriptor_table_cal_2eproto_sccs, descriptor_table_cal_2eproto_deps, 3, 0,
   schemas, file_default_instances, TableStruct_cal_2eproto::offsets,
-  file_level_metadata_cal_2eproto, 2, file_level_enum_descriptors_cal_2eproto, file_level_service_descriptors_cal_2eproto,
+  file_level_metadata_cal_2eproto, 3, file_level_enum_descriptors_cal_2eproto, file_level_service_descriptors_cal_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -535,6 +568,278 @@ void AddRsp::InternalSwap(AddRsp* other) {
 
 // ===================================================================
 
+void PersonRsp::InitAsDefaultInstance() {
+}
+class PersonRsp::_Internal {
+ public:
+  using HasBits = decltype(std::declval<PersonRsp>()._has_bits_);
+  static void set_has_rid(HasBits* has_bits) {
+    (*has_bits)[0] |= 1u;
+  }
+  static void set_has_msg(HasBits* has_bits) {
+    (*has_bits)[0] |= 2u;
+  }
+};
+
+PersonRsp::PersonRsp(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:cal.PersonRsp)
+}
+PersonRsp::PersonRsp(const PersonRsp& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      _has_bits_(from._has_bits_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  rid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (from._internal_has_rid()) {
+    rid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_rid(),
+      GetArena());
+  }
+  msg_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (from._internal_has_msg()) {
+    msg_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_msg(),
+      GetArena());
+  }
+  // @@protoc_insertion_point(copy_constructor:cal.PersonRsp)
+}
+
+void PersonRsp::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_PersonRsp_cal_2eproto.base);
+  rid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  msg_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+PersonRsp::~PersonRsp() {
+  // @@protoc_insertion_point(destructor:cal.PersonRsp)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void PersonRsp::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  rid_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  msg_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void PersonRsp::ArenaDtor(void* object) {
+  PersonRsp* _this = reinterpret_cast< PersonRsp* >(object);
+  (void)_this;
+}
+void PersonRsp::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void PersonRsp::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const PersonRsp& PersonRsp::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_PersonRsp_cal_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void PersonRsp::Clear() {
+// @@protoc_insertion_point(message_clear_start:cal.PersonRsp)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      rid_.ClearNonDefaultToEmpty();
+    }
+    if (cached_has_bits & 0x00000002u) {
+      msg_.ClearNonDefaultToEmpty();
+    }
+  }
+  _has_bits_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* PersonRsp::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  _Internal::HasBits has_bits{};
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // string rid = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          auto str = _internal_mutable_rid();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "cal.PersonRsp.rid"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // string msg = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          auto str = _internal_mutable_msg();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "cal.PersonRsp.msg"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  _has_bits_.Or(has_bits);
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* PersonRsp::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:cal.PersonRsp)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string rid = 1;
+  if (_internal_has_rid()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_rid().data(), static_cast<int>(this->_internal_rid().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "cal.PersonRsp.rid");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_rid(), target);
+  }
+
+  // string msg = 2;
+  if (_internal_has_msg()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_msg().data(), static_cast<int>(this->_internal_msg().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "cal.PersonRsp.msg");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_msg(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:cal.PersonRsp)
+  return target;
+}
+
+size_t PersonRsp::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:cal.PersonRsp)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    // string rid = 1;
+    if (cached_has_bits & 0x00000001u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_rid());
+    }
+
+    // string msg = 2;
+    if (cached_has_bits & 0x00000002u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_msg());
+    }
+
+  }
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void PersonRsp::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:cal.PersonRsp)
+  GOOGLE_DCHECK_NE(&from, this);
+  const PersonRsp* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<PersonRsp>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:cal.PersonRsp)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:cal.PersonRsp)
+    MergeFrom(*source);
+  }
+}
+
+void PersonRsp::MergeFrom(const PersonRsp& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:cal.PersonRsp)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      _internal_set_rid(from._internal_rid());
+    }
+    if (cached_has_bits & 0x00000002u) {
+      _internal_set_msg(from._internal_msg());
+    }
+  }
+}
+
+void PersonRsp::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:cal.PersonRsp)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void PersonRsp::CopyFrom(const PersonRsp& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:cal.PersonRsp)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool PersonRsp::IsInitialized() const {
+  return true;
+}
+
+void PersonRsp::InternalSwap(PersonRsp* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  swap(_has_bits_[0], other->_has_bits_[0]);
+  rid_.Swap(&other->rid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  msg_.Swap(&other->msg_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata PersonRsp::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
 CalService::~CalService() {}
 
 const ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor* CalService::descriptor() {
@@ -554,6 +859,14 @@ void CalService::Add(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
   done->Run();
 }
 
+void CalService::PersonHello(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
+                         const ::cal::PersonRsp*,
+                         ::cal::PersonRsp*,
+                         ::google::protobuf::Closure* done) {
+  controller->SetFailed("Method PersonHello() not implemented.");
+  done->Run();
+}
+
 void CalService::CallMethod(const ::PROTOBUF_NAMESPACE_ID::MethodDescriptor* method,
                              ::PROTOBUF_NAMESPACE_ID::RpcController* controller,
                              const ::PROTOBUF_NAMESPACE_ID::Message* request,
@@ -569,6 +882,14 @@ void CalService::CallMethod(const ::PROTOBUF_NAMESPACE_ID::MethodDescriptor* met
                  response),
              done);
       break;
+    case 1:
+      PersonHello(controller,
+             ::PROTOBUF_NAMESPACE_ID::internal::DownCast<const ::cal::PersonRsp*>(
+                 request),
+             ::PROTOBUF_NAMESPACE_ID::internal::DownCast<::cal::PersonRsp*>(
+                 response),
+             done);
+      break;
     default:
       GOOGLE_LOG(FATAL) << "Bad method index; this should never happen.";
       break;
@@ -581,6 +902,8 @@ const ::PROTOBUF_NAMESPACE_ID::Message& CalService::GetRequestPrototype(
   switch(method->index()) {
     case 0:
       return ::cal::AddReq::default_instance();
+    case 1:
+      return ::cal::PersonRsp::default_instance();
     default:
       GOOGLE_LOG(FATAL) << "Bad method index; this should never happen.";
       return *::PROTOBUF_NAMESPACE_ID::MessageFactory::generated_factory()
@@ -594,6 +917,8 @@ const ::PROTOBUF_NAMESPACE_ID::Message& CalService::GetResponsePrototype(
   switch(method->index()) {
     case 0:
       return ::cal::AddRsp::default_instance();
+    case 1:
+      return ::cal::PersonRsp::default_instance();
     default:
       GOOGLE_LOG(FATAL) << "Bad method index; this should never happen.";
       return *::PROTOBUF_NAMESPACE_ID::MessageFactory::generated_factory()
@@ -619,6 +944,13 @@ void CalService_Stub::Add(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
   channel_->CallMethod(descriptor()->method(0),
                        controller, request, response, done);
 }
+void CalService_Stub::PersonHello(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
+                              const ::cal::PersonRsp* request,
+                              ::cal::PersonRsp* response,
+                              ::google::protobuf::Closure* done) {
+  channel_->CallMethod(descriptor()->method(1),
+                       controller, request, response, done);
+}
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace cal
@@ -628,6 +960,9 @@ template<> PROTOBUF_NOINLINE ::cal::AddReq* Arena::CreateMaybeMessage< ::cal::Ad
 }
 template<> PROTOBUF_NOINLINE ::cal::AddRsp* Arena::CreateMaybeMessage< ::cal::AddRsp >(Arena* arena) {
   return Arena::CreateMessageInternal< ::cal::AddRsp >(arena);
+}
+template<> PROTOBUF_NOINLINE ::cal::PersonRsp* Arena::CreateMaybeMessage< ::cal::PersonRsp >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::cal::PersonRsp >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

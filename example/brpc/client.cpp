@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     brpc::ChannelOptions options;   // 实例化brpc通道配置对象
-    options.protocol = "baidu_std"; // 设置协议为baidu_std
+    options.protocol = "baidu_std"; // 设置协议为baidu_std,这里的协议是rpc协议
     options.timeout_ms = 1000;      // 设置超时时间为1000毫秒
     brpc::Channel channel;          // 实例化brpc通道对象
     // 初始化通道，应用服务器地址、通信协议和超时配置。

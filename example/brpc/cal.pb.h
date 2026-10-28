@@ -48,7 +48,7 @@ struct TableStruct_cal_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[2]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -62,10 +62,14 @@ extern AddReqDefaultTypeInternal _AddReq_default_instance_;
 class AddRsp;
 class AddRspDefaultTypeInternal;
 extern AddRspDefaultTypeInternal _AddRsp_default_instance_;
+class PersonRsp;
+class PersonRspDefaultTypeInternal;
+extern PersonRspDefaultTypeInternal _PersonRsp_default_instance_;
 }  // namespace cal
 PROTOBUF_NAMESPACE_OPEN
 template<> ::cal::AddReq* Arena::CreateMaybeMessage<::cal::AddReq>(Arena*);
 template<> ::cal::AddRsp* Arena::CreateMaybeMessage<::cal::AddRsp>(Arena*);
+template<> ::cal::PersonRsp* Arena::CreateMaybeMessage<::cal::PersonRsp>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace cal {
 
@@ -354,6 +358,195 @@ class AddRsp PROTOBUF_FINAL :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_cal_2eproto;
 };
+// -------------------------------------------------------------------
+
+class PersonRsp PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:cal.PersonRsp) */ {
+ public:
+  inline PersonRsp() : PersonRsp(nullptr) {};
+  virtual ~PersonRsp();
+
+  PersonRsp(const PersonRsp& from);
+  PersonRsp(PersonRsp&& from) noexcept
+    : PersonRsp() {
+    *this = ::std::move(from);
+  }
+
+  inline PersonRsp& operator=(const PersonRsp& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PersonRsp& operator=(PersonRsp&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const PersonRsp& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const PersonRsp* internal_default_instance() {
+    return reinterpret_cast<const PersonRsp*>(
+               &_PersonRsp_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(PersonRsp& a, PersonRsp& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(PersonRsp* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PersonRsp* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline PersonRsp* New() const final {
+    return CreateMaybeMessage<PersonRsp>(nullptr);
+  }
+
+  PersonRsp* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<PersonRsp>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const PersonRsp& from);
+  void MergeFrom(const PersonRsp& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(PersonRsp* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "cal.PersonRsp";
+  }
+  protected:
+  explicit PersonRsp(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_cal_2eproto);
+    return ::descriptor_table_cal_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kRidFieldNumber = 1,
+    kMsgFieldNumber = 2,
+  };
+  // string rid = 1;
+  bool has_rid() const;
+  private:
+  bool _internal_has_rid() const;
+  public:
+  void clear_rid();
+  const std::string& rid() const;
+  void set_rid(const std::string& value);
+  void set_rid(std::string&& value);
+  void set_rid(const char* value);
+  void set_rid(const char* value, size_t size);
+  std::string* mutable_rid();
+  std::string* release_rid();
+  void set_allocated_rid(std::string* rid);
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  std::string* unsafe_arena_release_rid();
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_rid(
+      std::string* rid);
+  private:
+  const std::string& _internal_rid() const;
+  void _internal_set_rid(const std::string& value);
+  std::string* _internal_mutable_rid();
+  public:
+
+  // string msg = 2;
+  bool has_msg() const;
+  private:
+  bool _internal_has_msg() const;
+  public:
+  void clear_msg();
+  const std::string& msg() const;
+  void set_msg(const std::string& value);
+  void set_msg(std::string&& value);
+  void set_msg(const char* value);
+  void set_msg(const char* value, size_t size);
+  std::string* mutable_msg();
+  std::string* release_msg();
+  void set_allocated_msg(std::string* msg);
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  std::string* unsafe_arena_release_msg();
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_msg(
+      std::string* msg);
+  private:
+  const std::string& _internal_msg() const;
+  void _internal_set_msg(const std::string& value);
+  std::string* _internal_mutable_msg();
+  public:
+
+  // @@protoc_insertion_point(class_scope:cal.PersonRsp)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr rid_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr msg_;
+  friend struct ::TableStruct_cal_2eproto;
+};
 // ===================================================================
 
 class CalService_Stub;
@@ -372,6 +565,10 @@ class CalService : public ::PROTOBUF_NAMESPACE_ID::Service {
   virtual void Add(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
                        const ::cal::AddReq* request,
                        ::cal::AddRsp* response,
+                       ::google::protobuf::Closure* done);
+  virtual void PersonHello(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
+                       const ::cal::PersonRsp* request,
+                       ::cal::PersonRsp* response,
                        ::google::protobuf::Closure* done);
 
   // implements Service ----------------------------------------------
@@ -405,6 +602,10 @@ class CalService_Stub : public CalService {
   void Add(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
                        const ::cal::AddReq* request,
                        ::cal::AddRsp* response,
+                       ::google::protobuf::Closure* done);
+  void PersonHello(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
+                       const ::cal::PersonRsp* request,
+                       ::cal::PersonRsp* response,
                        ::google::protobuf::Closure* done);
  private:
   ::PROTOBUF_NAMESPACE_ID::RpcChannel* channel_;
@@ -488,9 +689,201 @@ inline void AddRsp::set_result(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:cal.AddRsp.result)
 }
 
+// -------------------------------------------------------------------
+
+// PersonRsp
+
+// string rid = 1;
+inline bool PersonRsp::_internal_has_rid() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool PersonRsp::has_rid() const {
+  return _internal_has_rid();
+}
+inline void PersonRsp::clear_rid() {
+  rid_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline const std::string& PersonRsp::rid() const {
+  // @@protoc_insertion_point(field_get:cal.PersonRsp.rid)
+  return _internal_rid();
+}
+inline void PersonRsp::set_rid(const std::string& value) {
+  _internal_set_rid(value);
+  // @@protoc_insertion_point(field_set:cal.PersonRsp.rid)
+}
+inline std::string* PersonRsp::mutable_rid() {
+  // @@protoc_insertion_point(field_mutable:cal.PersonRsp.rid)
+  return _internal_mutable_rid();
+}
+inline const std::string& PersonRsp::_internal_rid() const {
+  return rid_.Get();
+}
+inline void PersonRsp::_internal_set_rid(const std::string& value) {
+  _has_bits_[0] |= 0x00000001u;
+  rid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void PersonRsp::set_rid(std::string&& value) {
+  _has_bits_[0] |= 0x00000001u;
+  rid_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:cal.PersonRsp.rid)
+}
+inline void PersonRsp::set_rid(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000001u;
+  rid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:cal.PersonRsp.rid)
+}
+inline void PersonRsp::set_rid(const char* value,
+    size_t size) {
+  _has_bits_[0] |= 0x00000001u;
+  rid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:cal.PersonRsp.rid)
+}
+inline std::string* PersonRsp::_internal_mutable_rid() {
+  _has_bits_[0] |= 0x00000001u;
+  return rid_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* PersonRsp::release_rid() {
+  // @@protoc_insertion_point(field_release:cal.PersonRsp.rid)
+  if (!_internal_has_rid()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return rid_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void PersonRsp::set_allocated_rid(std::string* rid) {
+  if (rid != nullptr) {
+    _has_bits_[0] |= 0x00000001u;
+  } else {
+    _has_bits_[0] &= ~0x00000001u;
+  }
+  rid_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), rid,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:cal.PersonRsp.rid)
+}
+inline std::string* PersonRsp::unsafe_arena_release_rid() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:cal.PersonRsp.rid)
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  _has_bits_[0] &= ~0x00000001u;
+  return rid_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      GetArena());
+}
+inline void PersonRsp::unsafe_arena_set_allocated_rid(
+    std::string* rid) {
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  if (rid != nullptr) {
+    _has_bits_[0] |= 0x00000001u;
+  } else {
+    _has_bits_[0] &= ~0x00000001u;
+  }
+  rid_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      rid, GetArena());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:cal.PersonRsp.rid)
+}
+
+// string msg = 2;
+inline bool PersonRsp::_internal_has_msg() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool PersonRsp::has_msg() const {
+  return _internal_has_msg();
+}
+inline void PersonRsp::clear_msg() {
+  msg_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline const std::string& PersonRsp::msg() const {
+  // @@protoc_insertion_point(field_get:cal.PersonRsp.msg)
+  return _internal_msg();
+}
+inline void PersonRsp::set_msg(const std::string& value) {
+  _internal_set_msg(value);
+  // @@protoc_insertion_point(field_set:cal.PersonRsp.msg)
+}
+inline std::string* PersonRsp::mutable_msg() {
+  // @@protoc_insertion_point(field_mutable:cal.PersonRsp.msg)
+  return _internal_mutable_msg();
+}
+inline const std::string& PersonRsp::_internal_msg() const {
+  return msg_.Get();
+}
+inline void PersonRsp::_internal_set_msg(const std::string& value) {
+  _has_bits_[0] |= 0x00000002u;
+  msg_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void PersonRsp::set_msg(std::string&& value) {
+  _has_bits_[0] |= 0x00000002u;
+  msg_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:cal.PersonRsp.msg)
+}
+inline void PersonRsp::set_msg(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000002u;
+  msg_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:cal.PersonRsp.msg)
+}
+inline void PersonRsp::set_msg(const char* value,
+    size_t size) {
+  _has_bits_[0] |= 0x00000002u;
+  msg_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:cal.PersonRsp.msg)
+}
+inline std::string* PersonRsp::_internal_mutable_msg() {
+  _has_bits_[0] |= 0x00000002u;
+  return msg_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* PersonRsp::release_msg() {
+  // @@protoc_insertion_point(field_release:cal.PersonRsp.msg)
+  if (!_internal_has_msg()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000002u;
+  return msg_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void PersonRsp::set_allocated_msg(std::string* msg) {
+  if (msg != nullptr) {
+    _has_bits_[0] |= 0x00000002u;
+  } else {
+    _has_bits_[0] &= ~0x00000002u;
+  }
+  msg_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), msg,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:cal.PersonRsp.msg)
+}
+inline std::string* PersonRsp::unsafe_arena_release_msg() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:cal.PersonRsp.msg)
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  _has_bits_[0] &= ~0x00000002u;
+  return msg_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      GetArena());
+}
+inline void PersonRsp::unsafe_arena_set_allocated_msg(
+    std::string* msg) {
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  if (msg != nullptr) {
+    _has_bits_[0] |= 0x00000002u;
+  } else {
+    _has_bits_[0] &= ~0x00000002u;
+  }
+  msg_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      msg, GetArena());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:cal.PersonRsp.msg)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 

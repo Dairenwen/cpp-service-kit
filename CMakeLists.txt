@@ -185,6 +185,7 @@ add_custom_command(
         "${BRPC_PROTO_DIR}/cal.pb.cc"
         "${BRPC_PROTO_DIR}/cal.pb.h"
     COMMAND protobuf::protoc
+        --experimental_allow_proto3_optional
         "--cpp_out=${BRPC_PROTO_DIR}"
         "--proto_path=${CMAKE_CURRENT_SOURCE_DIR}/example/brpc"
         "${CMAKE_CURRENT_SOURCE_DIR}/example/brpc/cal.proto"
@@ -217,4 +218,30 @@ target_link_libraries(brpc_client PRIVATE
     Threads::Threads ${CMAKE_DL_LIBS}
 )
 
+# 编译 example/brpc/async.cpp，生成 build/bin/brpc_async
+add_executable(brpc_async example/brpc/async.cpp)
+target_include_directories(brpc_async PRIVATE "${BRPC_INCLUDE_DIR}")
+target_link_libraries(brpc_async PRIVATE
+    brpc_proto "${BRPC_LIBRARY}" protobuf::libprotobuf gflags
+    "${LEVELDB_LIBRARY}" OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB
+    Threads::Threads ${CMAKE_DL_LIBS}
+)
+
+# 编译 example/brpc/http_server.cpp，生成 build/bin/brpc_http_server
+add_executable(brpc_http_server example/brpc/http_server.cpp)
+target_include_directories(brpc_http_server PRIVATE "${BRPC_INCLUDE_DIR}")
+target_link_libraries(brpc_http_server PRIVATE
+    brpc_proto "${BRPC_LIBRARY}" protobuf::libprotobuf gflags
+    "${LEVELDB_LIBRARY}" OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB
+    Threads::Threads ${CMAKE_DL_LIBS}
+)
+
+# 编译 example/brpc/http_client.cpp，生成 build/bin/brpc_http_client
+add_executable(brpc_http_client example/brpc/http_client.cpp)
+target_include_directories(brpc_http_client PRIVATE "${BRPC_INCLUDE_DIR}")
+target_link_libraries(brpc_http_client PRIVATE
+    brpc_proto "${BRPC_LIBRARY}" protobuf::libprotobuf gflags
+    "${LEVELDB_LIBRARY}" OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB
+    Threads::Threads ${CMAKE_DL_LIBS}
+)
 

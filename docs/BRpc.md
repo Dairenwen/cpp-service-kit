@@ -175,11 +175,11 @@ class Controller : public google::protobuf::RpcController {
     void set_timeout_ms(int64_t timeout_ms);
     void set_max_retry(int max_retry);
     void Reset();
-    google::protobuf::Message* response();
-    HttpHeader& http_response();//可以获取http响应
+    google::protobuf::Message* response();//获取/设置正文
+    HttpHeader& http_response();//可以获取/设置http响应头部
     butil::IOBuf& response_attachment();
-    HttpHeader& http_request();//可以获取http请求
-    butil::IOBuf& request_attachment();
+    HttpHeader& http_request();//可以获取/设置http请求头部
+    butil::IOBuf& request_attachment();//获取/设置正文
 
 
     bool Failed();
@@ -204,7 +204,7 @@ class IOBuf {
 };
 ```
 
-#### 2.2.5 客户端类与接口：
+#### 2.2.5 客户端类与接口
 
 ```cpp
 namespace brpc {
@@ -267,8 +267,6 @@ inline ::google::protobuf::Closure* NewCallback(void (*function)());
 
 头文件：bthread/unstable.h , butil/time.h
 
-代码块
-
 ```cpp
 
 // Return 0 on success, errno otherwise.
@@ -330,7 +328,7 @@ service EchoService {
 #include "main.pb.h"
 
 // 使用gflags定义一些命令行参数
-DEFINE_int32(listen_port, 8000, "服务器地址信息");
+DEFINE_int32(listen_port, 9000, "服务器地址信息");
 DEFINE_int32(idle_timeout_s, -1, "空闲连接超时关闭时间：默认-1表示不关闭");
 DEFINE_int32(thread_count, 3, "服务器启动线程数量");
 
@@ -406,7 +404,7 @@ int main(int argc, char* argv[]) {
 #include "main.pb.h"
 
 DEFINE_string(protocol, "baidu_std", "通信协议类型，默认使用brpc自定制协议");
-DEFINE_string(server_host, "127.0.0.1:8000", "服务器地址信息");
+DEFINE_string(server_host, "127.0.0.1:9000", "服务器地址信息");
 DEFINE_int32(timeout_ms, 500, "Rpc请求超时时间-毫秒");
 DEFINE_int32(max_retry, 3, "请求重试次数");
 
@@ -447,23 +445,9 @@ int main(int argc, char* argv[]) {
 }
 ```
 
-- 编写Makefile
-
-```cpp
-all: brpc_server brpc_client
-brpc_server: brpc_server.cc main.pb.cc
-   g++ -std=c++17 $^ -o $@ -lbrpc -lleveldb -lgflags -lssl -lcrypto -lprotobuf
-brpc_client: brpc_client.cc main.pb.cc
-   g++ -std=c++17 $^ -o $@ -lbrpc -lleveldb -lgflags -lssl -lcrypto -lprotobuf
-%.pb.cc : %.proto
-   protoc --cpp_out ./ $<
-```
-
-#### 2.3.2 异步调用
+#### 3.2 异步调用
 
 异步调用是指客户端注册一个响应处理回调函数， 当调用一个RPC接口时立即返回，不会阻塞等待响应， 当server端返回响应时会调用传入的回调函数处理响应。
-
-具体的做法：给CallMethod传递一个额外的回调对象done，CallMethod在发出request后就结束了，而不是在RPC结束后。当server端返回response或发生错误（包括超时）时，done->Run()会被调用。对RPC的后续处理应该写在done->Run()里，而不是CallMethod后。由于CallMethod结束不意味着RPC结束，response/controller仍可能被框架及done->Run()使用，它们一般得创建在堆上，并在done->Run()中删除。如果提前删除了它们，那当done->Run()被调用时，将访问到无效内存。
 
 下面是异步调用的伪代码：
 
@@ -489,9 +473,7 @@ request.set_foo(...);cntl->set_timeout_ms(...);
 stub.some_method(cntl, &request, response, brpc::NewCallback(OnRPCDone, response, cntl));
 ```
 
-#### 2.3.3 定时任务
-
-代码块
+#### 3.3 定时任务
 
 ```cpp
 #include <iostream>
@@ -518,399 +500,6 @@ int main()
     std::this_thread::sleep_for(std::chrono::seconds(10));
     return 0;
 }
-```
-
-## 3. 样例
-
-### 3.1 proto文件
-
-```cpp
-syntax="proto3";
-package example;
-option cc_generic_services = true;
-
-message PersonReq {
-   optional string rid = 1;
-   optional string ssid = 2;
-   optional string uid = 3;
-   optional string name = 4;
-   optional int32 age = 5;
-   repeated string skills = 6;
-   map<string, float> scores = 7;
-}
-message PersonRsp {
-   optional string rid = 1;
-   optional string msg = 2;
-}
-
-message DictReq {
-   optional string rid = 1;
-   optional string msg = 2;
-}
-message DictRsp {
-   optional string rid = 1;
-   optional string msg = 2;
-}
-//HTTP请求的时候：uri=/RpcService/DictoryMap
-//RPC请求的时候：stub.DictoryMap()
-service RpcService {
-   rpc DictoryMap(DictReq) returns(DictRsp);
-   rpc PersonHello(PersonReq) returns(PersonRsp);
-}
-```
-
-### 3.2 util代码
-
-```cpp
-#pragma once
-#include <jsoncpp/json/json.h>
-#include <sstream>
-#include <memory>
-
-class JU {
-   public:
-       static std::string serialize(const Json::Value &val) {
-           Json::StreamWriterBuilder swb;
-           swb.settings_["commentStyle"] = "None";
-           swb.settings_["indentation"] = "";
-           std::unique_ptr<Json::StreamWriter> psw(swb.newStreamWriter());
-           std::stringstream ss;
-           try{
-               psw->write(val, &ss);
-           }catch(Json::Exception &e) {
-               std::cout << "Error:" << e.what() <<  std::endl;
-               abort();
-           }
-           return ss.str();
-       }
-};
-```
-
-### 3.3 HTTP客户端
-
-```cpp
-#include <google/protobuf/util/json_util.h>
-#include <jsoncpp/json/json.h>
-#include <iostream>
-#include <string>
-#include <butil/logging.h>
-#include <brpc/policy/gzip_compress.h>
-#include <brpc/channel.h>
-#include <brpc/restful.h>
-#include "util.h"
-#include "example.pb.h"
-
-std::string make_person_json_req(){
-   Json::Value req;
-   req["rid"] = "rid:11111";
-   req["ssid"] = "ssid:22222";
-   req["age"] = 23;
-   req["skills"].append("C++");
-   req["skills"].append("Java");
-   req["skills"].append("Go");
-   Json::Value item;
-   item["Ch"] = 88.5;
-   item["Mt"] = 77.5;
-   item["En"] = 99.5;
-   req["scores"] = item;
-   return JU::serialize(req);
-}
-std::string make_dict_json_req() {
-   Json::Value req;
-   req["rid"] = "rid:33333";
-   req["msg"] = "Hello";
-   return JU::serialize(req);
-}
-int main()
-{
-   brpc::ChannelOptions options;
-   options.protocol = brpc::PROTOCOL_HTTP;
-   brpc::Channel channel;
-   channel.Init("127.0.0.1:9090", &options);
-
-   brpc::Controller cntl;
-   cntl.http_request().uri() = "/RpcService/DictoryMap";
-   cntl.http_request().set_method(brpc::HTTP_METHOD_POST);
-   cntl.request_attachment().append(make_dict_json_req());
-   channel.CallMethod(NULL, &cntl, NULL, NULL, NULL);
-
-   const std::string* encoding = cntl.http_response().GetHeader("Content-Encoding");
-   if (encoding && *encoding == "gzip") {
-       butil::IOBuf uncompressed;
-       if (!brpc::policy::GzipDecompress(cntl.response_attachment(), &uncompressed)) {
-           LOG(ERROR) << "Fail to un-gzip response body";
-           return - 1;
-       }
-       cntl.response_attachment().swap(uncompressed);
-   }
-   std::cout << cntl.http_response().status_code() << std::endl;
-   std::cout << cntl.response_attachment().to_string() << std::endl;
-
-   cntl.Reset();
-   cntl.http_request().uri() = "/RpcService/PersonHello";
-   cntl.http_request().set_method(brpc::HTTP_METHOD_POST);
-   cntl.request_attachment().append(make_person_json_req());
-   channel.CallMethod(NULL, &cntl, NULL, NULL, NULL);
-
-   encoding = cntl.http_response().GetHeader("Content-Encoding");
-   if (encoding && *encoding == "gzip") {
-       butil::IOBuf uncompressed;
-       if (!brpc::policy::GzipDecompress(cntl.response_attachment(), &uncompressed)) {
-           LOG(ERROR) << "Fail to un-gzip response body";
-           return - 1;
-       }
-       cntl.response_attachment().swap(uncompressed);
-   }
-   std::cout << cntl.http_response().status_code() << std::endl;
-   std::cout << cntl.response_attachment().to_string() << std::endl;
-
-   return 0;
-}
-```
-
-### 3.4 HTTP服务端+Rpc客户端
-
-代码块
-
-```cpp
-
-void asyncDict(
-    brpc::Controller* httpcntl,
-    google::protobuf::Closure* done,
-    brpc::Controller* rpccntl,
-    const example::DictReq *request,
-    example::DictRsp *response) {
-
-    brpc::ClosureGuard done_guard(done);
-    if (rpccntl->Failed()) {
-        LOG(ERROR) << "RPC failed: " << rpccntl->ErrorText();
-    }else {
-        std::string json_str;
-        auto ret = google::protobuf::util::MessageToJsonString(*response, &json_str);
-        if (ret.ok() == false) {
-            std::cout << ret.ToString() << std::endl;
-        }else {
-            LOG(ERROR) << "rpc rsp: [" << json_str << "]";
-            httpcntl->http_response().set_status_code(200);
-            httpcntl->http_response().set_content_type("application/json");
-            httpcntl->response_attachment().append(json_str);
-        }
-    }
-    delete rpccntl;
-    // delete request;
-    // delete response;
-    return;
-}
-void asyncHello(
-    brpc::Controller* httpcntl,
-    google::protobuf::Closure* httpdone,
-    brpc::Controller* rpccntl,
-    example::PersonReq *request,
-    example::PersonRsp *response) {
-
-    brpc::ClosureGuard done_guard(httpdone);
-    if (rpccntl->Failed()) {
-        LOG(ERROR) << "RPC failed: " << rpccntl->ErrorText();
-    }else {
-        std::string json_str;
-        auto ret = google::protobuf::util::MessageToJsonString(*response, &json_str);
-        if (ret.ok() == false) {
-            std::cout << ret.ToString() << std::endl;
-        }else {
-            LOG(ERROR) << "rpc rsp: [" << json_str << "]";
-            httpcntl->http_response().set_status_code(200);
-            httpcntl->http_response().set_content_type("application/json");
-            httpcntl->response_attachment().append(json_str);
-        }
-    }
-    delete rpccntl;
-    delete request;
-    // delete response;
-    return;
-}
-
-#include <google/protobuf/util/json_util.h>
-#include <jsoncpp/json/json.h>
-#include <iostream>
-#include <string>
-#include <butil/logging.h>
-#include <brpc/server.h>
-#include <brpc/channel.h>
-#include <brpc/restful.h>
-#include "example.pb.h"
-//HTTP请求的异步处理过程：其实就是异步请求子服务，收到响应后自动进行回复
-class HttpServiceImpl : public example::RpcService {
-   public:
-       HttpServiceImpl(){
-           _channel = std::make_unique<brpc::Channel>();
-           _channel->Init("127.0.0.1:9091", nullptr);
-           _stub = std::make_unique<example::RpcService_Stub>(_channel.get());
-       }
-       virtual ~HttpServiceImpl(){}
-       virtual void DictoryMap(google::protobuf::RpcController* controller,
-           const ::example::DictReq* request,
-           ::example::DictRsp* response,
-           ::google::protobuf::Closure* done) {
-           //发送过来的HTTP请求会自动被转换为protobuf结构放入request中
-           brpc::Controller* cntl = static_cast<brpc::Controller*>(controller);
-           example::DictReq* req = new example::DictReq;
-           req->CopyFrom(*request);
-
-           std::string test_json;
-           google::protobuf::util::MessageToJsonString(*request, &test_json);
-           LOG(ERROR) << "dict test:[" << test_json << "]";
-
-           brpc::Controller* rpccntl = new brpc::Controller();
-           auto rpcdone = brpc::NewCallback(asyncDict, cntl, done, rpccntl, request, response);
-           _stub->DictoryMap(rpccntl, request, response, rpcdone);
-           LOG(ERROR) << "DictoryMap Call Over!";
-       }
-       virtual void PersonHello(google::protobuf::RpcController* controller,
-           const ::example::PersonReq* request,
-           ::example::PersonRsp* response,
-           ::google::protobuf::Closure* done) {
-           //
-           std::string test_json;
-           google::protobuf::util::MessageToJsonString(*request, &test_json);
-           LOG(ERROR) << "hello test:[" << test_json << "]";
-
-           brpc::Controller* cntl = static_cast<brpc::Controller*>(controller);
-           //获取请求正文，并进行json反序列化
-           example::PersonReq* req = new example::PersonReq;
-           req->CopyFrom(*request);
-           req->set_name("zhangsan");
-           req->set_uid("uid:123456");
-           auto cb = [](google::protobuf::RpcController* controller,
-           const ::example::PersonReq* request,
-           ::example::PersonRsp* response,
-           ::google::protobuf::Closure* done){};
-           auto bcb = std::bind(cb, controller, request, response, done);
-           auto xdone = brpc::NewCallback(&bcb);
-
-           brpc::Controller* rpccntl = new brpc::Controller();
-           //需要注意的是brpc的NewCallback中不能针对仿函数进行处理
-           auto rpcdone = brpc::NewCallback(asyncHello, cntl, done, rpccntl, req, response);
-           _stub->PersonHello(rpccntl, req, response, rpcdone);
-           LOG(ERROR) << "PersonHello Call Over!";
-       }
-   private:
-       std::unique_ptr<brpc::Channel> _channel;
-       std::unique_ptr<example::RpcService_Stub> _stub;
-};
-int main()
-{
-   brpc::Server server;
-   HttpServiceImpl http_svc;
-   if (server.AddService(&http_svc,brpc::SERVER_DOESNT_OWN_SERVICE) != 0) {
-       LOG(ERROR) << "Fail to add http_svc";
-       return -1;
-   }
-   brpc::ServerOptions options;
-   options.idle_timeout_sec = -1;
-   if (server.Start(9090, &options) != 0) {
-       LOG(ERROR) << "Fail to start HttpServer";
-       return -1;
-   }
-   server.RunUntilAskedToQuit();
-   return 0;
-}
-```
-
-### 3.5 Rpc服务端
-
-Rpc同步处理过程
-
-```cpp
-#include <google/protobuf/util/json_util.h>
-#include <jsoncpp/json/json.h>
-#include <iostream>
-#include <string>
-#include <butil/logging.h>
-#include <brpc/server.h>
-#include <brpc/restful.h>
-#include "example.pb.h"
-
-class RpcServiceImpl : public example::RpcService {
-   public:
-       RpcServiceImpl(){ }
-       virtual ~RpcServiceImpl(){}
-       virtual void DictoryMap(
-           google::protobuf::RpcController* controller,
-           const ::example::DictReq* request,
-           ::example::DictRsp* response,
-           ::google::protobuf::Closure* done){
-
-           brpc::ClosureGuard done_guard(done);
-           std::string test_json;
-           google::protobuf::util::MessageToJsonString(*request, &test_json);
-           LOG(ERROR) << "dict request:[" << test_json << "]";
-           if (request->msg() == "Hello") {
-               response->set_msg("你好！");
-           } else {
-               response->set_msg("未知！");
-           }
-       }
-       virtual void PersonHello(
-           google::protobuf::RpcController* controller,
-           const ::example::PersonReq* request,
-           ::example::PersonRsp* response,
-           ::google::protobuf::Closure* done){
-
-           brpc::ClosureGuard done_guard(done);
-           std::string test_json;
-           google::protobuf::util::MessageToJsonString(*request, &test_json);
-           LOG(ERROR) << "dict request:[" << test_json << "]";
-           std::stringstream ss;
-           ss << request->name() << " 你好！" << "\n";
-           ss << " 你的用户ID为: " << request->uid() << "\n";
-           ss << " 你的年龄为: " << request->age() << "\n";
-           ss << " 你的技能有: \n";
-           int sz = request->skills_size();
-           for (int i = 0; i < sz; i++) {
-               ss << request->skills(i) << " ";
-           }
-           float total = 0;
-           auto beg = request->scores().begin();
-           for (; beg != request->scores().end(); ++beg){
-               total += beg->second;
-           }
-           ss << "你的成绩总分为: " << total << "\n";
-           response->set_msg(ss.str());
-       }
-};
-
-int main()
-{
-   brpc::Server server;
-   RpcServiceImpl rpc_svc;
-   if (server.AddService(&rpc_svc,brpc::SERVER_DOESNT_OWN_SERVICE) != 0) {
-       LOG(ERROR) << "Fail to add rpc_svc";
-       return -1;
-   }
-   brpc::ServerOptions options;
-   options.idle_timeout_sec = -1;
-   if (server.Start(9091, &options) != 0) {
-       LOG(ERROR) << "Fail to start HttpServer";
-       return -1;
-   }
-   server.RunUntilAskedToQuit();
-   return 0;
-}
-```
-
-### 3.6 Makefile
-
-```cpp
-LFLAGS=-lbrpc -lleveldb -lgflags -lssl -lcrypto -lprotobuf -ljsoncpp
-all: client http_server rpc_server
-client: client.cc example.pb.cc
-   g++ -std=c++17 $^ -o $@ $(LFLAGS)
-http_server: http_server.cc example.pb.cc
-   g++ -std=c++17 $^ -o $@ $(LFLAGS)
-rpc_server: rpc_server.cc example.pb.cc
-   g++ -std=c++17 $^ -o $@ $(LFLAGS)
-example.pb.cc : example.proto
-   protoc --experimental_allow_proto3_optional --cpp_out=./ $<
 ```
 
 ## 4. 封装
@@ -975,13 +564,11 @@ example.pb.cc : example.proto
 
 #### 4.2.1 服务信道管理类
 
-代码块
-
 ```cpp
 //指定服务的信道管理类
 class Channels {
     public:
-        using ptr = std::shared_ptr<Channels>;
+        using ChannelPtr = std::shared_ptr<Channels>;
         Channels();
         //1. 新增节点
         void insert(const std::string &addr);
@@ -1045,8 +632,6 @@ std::optional<std::string> Channels::selectAddr() {
 ```
 
 #### 4.2.2 服务管理类
-
-代码块
 
 ```cpp
 //服务管理类
@@ -1119,9 +704,7 @@ std::optional<std::string> SvcChannels::getNodeAddr(
 }
 ```
 
-#### 4.2.3 工厂类：
-
-代码块
+#### 4.2.3 工厂类
 
 ```cpp
 #pragma once
@@ -1152,7 +735,6 @@ void ClosureFactory::asyncCallback(const Object::ptr obj) {
 }
 ```
 
-代码块
 
 ```cpp
 class RpcServerFactory {
@@ -1179,216 +761,4 @@ std::shared_ptr<brpc::Server> RpcServerFactory::create(int port,
     }
     return server;
 }
-```
-
-#### 4.2.4 使用样例：
-
-##### 4.2.4.1 目录结构
-
-代码块
-
-```cpp
-dev@fc56006988fe:~/test/brpc$ tree .
-.
-|-- CMakeLists.txt
-|-- cal.proto
-|-- rpc_client.cc
-`-- rpc_server.cc
-```
-
-##### 4.2.4.2 样例代码
-
-cal.proto
-
-```protobuf
-syntax = "proto3";
-package cal;
-option cc_generic_services = true;
-
-message AddReq {
-    int32 num1 = 1;
-    int32 num2 = 2;
-};
-
-message AddRsp {
-    int32 result = 1;
-};
-
-//这是一个http请求，它不需要其他字段
-message helloReq {
-}
-message helloRsp{
-}
-
-service CalService {
-    rpc Add(AddReq) returns (AddRsp);
-    rpc Hello(helloReq) returns (helloRsp);
-};
-```
-
-rpc_client.cc
-
-```cpp
-#include "bite_scaffold/rpc.h"
-#include "bite_scaffold/log.h"
-#include "cal.pb.h"
-
-int main()
-{
-    // 进来后，先初始化日志系统
-    bitelog::bitelog_init();
-    // 0. 实例化服务节点管理对象
-    biterpc::SvcChannels scs;
-    // 1.手动添加服务端需要管理的服务名称
-    scs.setWatch("user");
-    // 2.  模拟服务发现，手动添加服务节点
-    scs.addNode("user", "192.168.65.128:9000");
-    // 2. 获取节点对应的channel
-    auto channel = scs.getNode("user");
-    if (!channel) {
-        ERR("没有可供调用的服务！");
-        return -1;
-    }
-    // 3. 发起rpc请求：实例化stub对象，new出req，rsp，异步回调对象
-    brpc::Controller* cntl = new brpc::Controller;
-    cal::AddReq *request = new cal::AddReq;
-    request->set_num1(22);
-    request->set_num2(333);
-    cal::AddRsp *response = new cal::AddRsp;
-    auto closure = biterpc::ClosureFactory::create([=](){
-        std::unique_ptr<brpc::Controller> cntl_guard(cntl);
-        std::unique_ptr<cal::AddReq> req_guard(request);
-        std::unique_ptr<cal::AddRsp> rsp_guard(response);
-        if (cntl_guard->Failed() == true) {
-            std::cout << "rpc请求失败: " << cntl_guard->ErrorText() << std::endl;
-            return ;
-        }
-        std::cout << rsp_guard->result() << std::endl;
-    });
-    cal::CalService_Stub stub(channel.get());
-    stub.Add(cntl, request, response, closure);
-    std::cout << "===================================\n";
-    getchar();//让程序停在这里等待异步处理结果，不要退出了。
-    return 0;
-}
-```
-
-rpc_server.cc
-
-```cpp
-#include "bite_scaffold/rpc.h"
-#include "bite_scaffold/log.h"
-#include "cal.pb.h"
-
-class CalServiceImpl : public cal::CalService {
-    public:
-        CalServiceImpl() {}
-        ~CalServiceImpl() {}
-        void Add(::google::protobuf::RpcController* controller,
-            const ::cal::AddReq* request,
-            ::cal::AddRsp* response,
-            ::google::protobuf::Closure* done) override {
-            //当done_guard被释放的时候执行done->Run()来完成本次rpc调用
-            brpc::ClosureGuard done_guard(done);
-            int result = request->num1() + request->num2();
-            response->set_result(result);
-        }
-        void Hello(::google::protobuf::RpcController* controller,
-            const ::cal::helloReq* request,
-            ::cal::helloRsp* response,
-            ::google::protobuf::Closure* done) override {
-            //别忘了设置Closure管理
-            brpc::ClosureGuard done_guard(done);
-            brpc::Controller* cntl = (brpc::Controller*)controller;
-            const auto& headers = cntl->http_request();
-            std::cout << "Method:";
-            std::cout << brpc::HttpMethod2Str(headers.method()) << std::endl;
-            std::cout << "Body:";
-            std::cout << cntl->request_attachment().to_string() << std::endl;
-
-            cntl->response_attachment().append("回显:" +
-                cntl->request_attachment().to_string());
-            cntl->http_response().set_status_code(200);
-        }
-};
-int main()
-{
-    CalServiceImpl *cal_service = new CalServiceImpl;
-    auto server = biterpc::RpcServerFactory::create(9000, cal_service);
-    server->RunUntilAskedToQuit();
-    return 0;
-}
-```
-
-##### 4.2.4.3 项目构建
-
-代码块
-
-```cpp
-# 1. 声明cmake所需版本
-cmake_minimum_required(VERSION 3.1.3)
-
-# 2. 设置工程项目名称（内部会生成一系列的内置变量）
-project(discovery VERSION 1.0)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++17")
-
-# 3. 添加生成目标（可执行程序）
-set(server_target "discovery")
-add_executable(${server_target} ${CMAKE_CURRENT_SOURCE_DIR}/discovery.cc)
-
-set(client_target "registry")
-add_executable(${client_target} ${CMAKE_CURRENT_SOURCE_DIR}/registry.cc)
-
-# 4. 依赖检查（依赖库的查找以及链接选项的添加）
-find_package(bite_scaffold REQUIRED)
-
-# 5. 设置链接库
-target_link_libraries(${server_target} PRIVATE bite_scaffold::bite_scaffold)
-target_link_libraries(${client_target} PRIVATE bite_scaffold::bite_scaffold)
-```
-
-##### 4.2.4.4 运行演示
-
-代码块
-
-```text
-dev@fc56006988fe:~/test/brpc$ mkdir build
-dev@fc56006988fe:~/test/brpc$ cd build/
-dev@fc56006988fe:~/test/brpc/build$ cmake ..
--- The C compiler identification is GNU 11.4.0
--- The CXX compiler identification is GNU 11.4.0
-...
--- 找到依赖库: amqpcpp - /usr/lib/libamqpcpp.so
--- 找到依赖库: ev - /usr/lib/x86_64-linux-gnu/libev.so
-...
--- Configuring done
--- Generating done
--- Build files have been written to: test/brpc/build
-dev@fc56006988fe:~/test/brpc/build$ make
-[ 16%] Building CXX object CMakeFiles/rpc_server.dir/rpc_server.cc.o
-[ 33%] Building CXX object CMakeFiles/rpc_server.dir/cal.pb.cc.o
-[ 50%] Linking CXX executable rpc_server
-[ 50%] Built target rpc_server
-[ 66%] Building CXX object CMakeFiles/rpc_client.dir/rpc_client.cc.o
-[ 83%] Building CXX object CMakeFiles/rpc_client.dir/cal.pb.cc.o
-[100%] Linking CXX executable rpc_client
-[100%] Built target rpc_client
-```
-
-代码块
-
-```text
-dev@fc56006988fe:~/test/brpc/build$ ./rpc_server
-W0903     0 bthread/bthread.cpp:409] Fail to set concurrency by tag: 0, tag concurrency must larger than old oncurrency. old concurrency: 8, new concurrency: 4
-I0903     0 brpc/server.cpp:1208] Server[CalServiceImpl] is serving on port=9000.
-I0903     0 brpc/server.cpp:1211] Check out http://fc56006988fe:9000 in web browser.
-```
-
-代码块
-
-```text
-dev@fc56006988fe:~/test/brpc/build$ ./rpc_client
-[06:36:42][debug  ]: [source/rpc.cc:75]: 添加 user 服务节点 192.168.65.128:9000 管理
-===================================
-355
 ```

@@ -11,7 +11,13 @@ message AddRsp {
   int32 result = 1;
 };
 
+message PersonRsp {
+  optional string rid = 1;
+  optional string msg = 2;
+}
+
 //service表示一个Rpc服务
 service CalService {
   rpc Add(AddReq) returns (AddRsp);// 表示Add方法的请求参数是AddReq，返回参数是AddRsp
+  rpc PersonHello(PersonRsp) returns (PersonRsp);
 };

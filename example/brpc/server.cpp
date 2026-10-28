@@ -1,5 +1,6 @@
 #include "cal.pb.h"
 #include <brpc/server.h>
+#include <thread>
 #include <brpc/closure_guard.h>
 
 class CalServiceImpl : public cal::CalService
@@ -12,10 +13,21 @@ public:
              const cal::AddReq *request, cal::AddRsp *response,
              google::protobuf::Closure *done) override
     {
-        brpc::ClosureGuard done_guard(done); // 使用RAII思想，自动调用done进行资源释放
-        int32_t a = request->num1();
-        int32_t b = request->num2();
-        response->set_result(a + b);
+        // brpc::ClosureGuard done_guard(done); // 使用RAII思想，自动调用done进行资源释放，此为同步调用方式
+        std::thread thr([=]()
+                        {
+                            brpc::ClosureGuard done_guard(done); // 在异步线程中使用RAII思想，自动调用done进行资源释放
+
+                            int result = request->num1() + request->num2();
+                            response->set_result(result);
+
+                            std::this_thread::sleep_for(std::chrono::seconds(3)); // 模拟耗时操作
+                        });
+
+        thr.detach(); // 分离线程，不join，可以处理其他请求，避免阻塞主线程
+        // int32_t a = request->num1();
+        // int32_t b = request->num2();
+        // response->set_result(a + b);
     }
 };
 
