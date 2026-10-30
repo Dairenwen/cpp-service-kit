@@ -1,0 +1,18 @@
+syntax = "proto3";
+package breeze_test;
+option cc_generic_services = true;
+
+// 使用两个整数验证 RPC 请求和响应。
+message AddRequest {
+  int32 a = 1;
+  int32 b = 2;
+}
+
+message AddResponse {
+  int32 result = 1;
+}
+
+// 提供一个加法方法，供客户端测试调用。
+service Calculator {
+  rpc Add(AddRequest) returns (AddResponse);
+}

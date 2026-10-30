@@ -1,44 +1,31 @@
-#include "log.h"
+#include "BreezeLog.hpp"
 
+#include <memory>
 #include <spdlog/async.h>
-#include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace Breezelog
+namespace BreezeLog
 {
-
-    std::shared_ptr<spdlog::logger> g_logger;
-
-    // 按同步或异步方式创建控制台日志器或文件日志器。
-    void Breezelog_init(const log_settings &settings)
+    // 创建独立的异步队列，后台线程按顺序输出日志。
+    spdlog::logger &Logger::getLogger()
     {
-        if (settings.async)
+        static auto logger = []
         {
-            if (settings.path == "stdout")
-            {
-                g_logger = spdlog::stdout_color_mt<spdlog::async_factory>("stdout_logger");
-            }
-            else
-            {
-                g_logger = spdlog::basic_logger_mt<spdlog::async_factory>(
-                    "file_logger", settings.path);
-            }
-        }
-        else
-        {
-            if (settings.path == "stdout")
-            {
-                g_logger = spdlog::stdout_color_mt("stdout_logger");
-            }
-            else
-            {
-                g_logger = spdlog::basic_logger_mt("file_logger", settings.path);
-            }
-        }
-
-        // 统一应用日志等级和正文格式。
-        g_logger->set_level(static_cast<spdlog::level::level_enum>(settings.level));
-        g_logger->set_pattern(settings.format);
+            auto sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+            static auto pool = std::make_shared<spdlog::details::thread_pool>(8192, 1);
+            auto instance = std::make_shared<spdlog::async_logger>(
+                "Breeze", sink, pool, spdlog::async_overflow_policy::block);
+            instance->set_level(spdlog::level::warn);
+            instance->set_pattern("[%Y-%m-%d %H:%M:%S] [%^%l%$] [%s:%#] %v");
+            instance->flush_on(spdlog::level::warn);
+            return instance;
+        }();
+        return *logger;
     }
 
-} // namespace bitelog
+    // 调整共用日志的最低输出级别。
+    void Logger::setLevel(spdlog::level::level_enum level)
+    {
+        getLogger().set_level(level);
+    }
+}

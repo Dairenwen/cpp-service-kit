@@ -23,17 +23,16 @@ public:
 
     Channels();
 
-    void insert(const std::string &addr);    // 新增节点
-    void remove(const std::string &addr);    // 删除节点
-    ChannelPtr select();                     // 轮询选择一个节点
-    std::optional<std::string> selectAddr(); // 轮询选择一个节点的地址
+    void insert(const std::string &addr); // 新增节点
+    void remove(const std::string &addr); // 删除节点
+    ChannelPtr select();                  // 轮询选择一个节点
 
 private:
     std::mutex _mtx;
     uint32_t _idx;
     std::string _svc_name;
-    std::unordered_map<std::string, ChannelPtr> _channels; // 地址 -> 通道
-    std::vector<std::string> _channel_list;                // 地址列表，便于轮询
+    std::unordered_map<std::string, ChannelPtr> _channels; // ip地址 -> 通道
+    std::vector<ChannelPtr> _channel_list;                 // 地址列表，便于轮询
 };
 
 // 管理多个服务名称及其节点集合。
@@ -42,15 +41,12 @@ class SvcChannels
 public:
     using ptr = std::shared_ptr<SvcChannels>;
 
-    void setWatch(const std::string &svc_name);                          // 创建服务节点集合
-    void addNode(const std::string &svc_name, const std::string &addr);  // 新增节点
-    void delNode(const std::string &svc_name, const std::string &addr);  // 删除节点
-    Channels::ChannelPtr getNode(const std::string &svc_name);           // 轮询选择一个节点
-    std::optional<std::string> getNodeAddr(const std::string &svc_name); // 轮询选择一个节点的地址
+    void setWatch(const std::string &svc_name);                         // 创建服务节点集合
+    void addNode(const std::string &svc_name, const std::string &addr); // 新增节点
+    void delNode(const std::string &svc_name, const std::string &addr); // 删除节点
+    Channels::ChannelPtr getNode(const std::string &svc_name);          // 轮询选择一个节点
 
 private:
-    Channels::ptr _channels(const std::string &svc_name);
-
     std::mutex _mtx;
     std::unordered_map<std::string, Channels::ptr> _maps;
 };
@@ -60,7 +56,6 @@ class ClosureFactor
 {
 public:
     using callback_t = std::function<void()>;
-
     static google::protobuf::Closure *create(callback_t cb);
 
 private:
@@ -69,14 +64,8 @@ private:
         using ptr = std::shared_ptr<Object>;
         callback_t callback;
     };
-    {
-        using ptr = std::shared_ptr<Object>;
-        callback_t callback;
-    };
 
-    class CallbackClosure;
-
-    static void asyncCallback(const Object::ptr &obj);
+    static void asyncCallback(const Object::ptr obj);
 };
 
 // 创建并启动一个 brpc 服务端。

@@ -1,36 +1,31 @@
 #pragma once
+
 #include <spdlog/spdlog.h>
-#include <memory>
-#include <string>
 
-namespace Breezelog
+namespace BreezeLog
 {
-
-    // 配置日志的执行方式、过滤等级、输出格式及输出位置。
-    struct log_settings
+    // 管理共用的异步终端日志，首次使用时自动创建。
+    class Logger
     {
-        bool async = false;
-        // spdlog 等级：1-debug、2-info、3-warn、4-error、6-off。
-        int level = 1;
-        std::string format = "[%H:%M:%S][%-7l]: %v";
-        // stdout 表示控制台，其余取值作为日志文件路径。
-        std::string path = "stdout";
+    public:
+        // 获取日志对象，可通过 spdlog 接口调整其他设置。
+        static spdlog::logger &getLogger();
+
+        // 设置最低输出级别，例如 spdlog::level::info。
+        static void setLevel(spdlog::level::level_enum level);
     };
+}
 
-    extern std::shared_ptr<spdlog::logger> g_logger;
+// 日志宏记录调用位置，默认输出 WARN 及以上级别。
+#define BREEZE_LOG_TRACE(...) SPDLOG_LOGGER_CALL(&::BreezeLog::Logger::getLogger(), ::spdlog::level::trace, __VA_ARGS__)
+#define BREEZE_LOG_DEBUG(...) SPDLOG_LOGGER_CALL(&::BreezeLog::Logger::getLogger(), ::spdlog::level::debug, __VA_ARGS__)
+#define BREEZE_LOG_INFO(...) SPDLOG_LOGGER_CALL(&::BreezeLog::Logger::getLogger(), ::spdlog::level::info, __VA_ARGS__)
+#define BREEZE_LOG_WARN(...) SPDLOG_LOGGER_CALL(&::BreezeLog::Logger::getLogger(), ::spdlog::level::warn, __VA_ARGS__)
+#define BREEZE_LOG_ERROR(...) SPDLOG_LOGGER_CALL(&::BreezeLog::Logger::getLogger(), ::spdlog::level::err, __VA_ARGS__)
+#define BREEZE_LOG_CRITICAL(...) SPDLOG_LOGGER_CALL(&::BreezeLog::Logger::getLogger(), ::spdlog::level::critical, __VA_ARGS__)
 
-    // 根据配置创建全局日志器，并设置日志过滤等级及输出格式。
-    void Breezelog_Init(const log_settings &settings = log_settings());
-
-} // namespace bitelog
-
-// 在日志正文前添加调用位置的文件名和行号。
-#define FMT_PREFIX std::string("[{}:{}]: ")
-#define DBG(fmt, ...) \
-    Breezelog::g_logger->debug(FMT_PREFIX + fmt, __FILE__, __LINE__, ##__VA_ARGS__)
-#define INF(fmt, ...) \
-    Breezelog::g_logger->info(FMT_PREFIX + fmt, __FILE__, __LINE__, ##__VA_ARGS__)
-#define WRN(fmt, ...) \
-    Breezelog::g_logger->warn(FMT_PREFIX + fmt, __FILE__, __LINE__, ##__VA_ARGS__)
-#define ERR(fmt, ...) \
-    Breezelog::g_logger->error(FMT_PREFIX + fmt, __FILE__, __LINE__, ##__VA_ARGS__)
+// 保留项目中使用的简短日志宏。
+#define DBG(...) BREEZE_LOG_DEBUG(__VA_ARGS__)
+#define INF(...) BREEZE_LOG_INFO(__VA_ARGS__)
+#define WRN(...) BREEZE_LOG_WARN(__VA_ARGS__)
+#define ERR(...) BREEZE_LOG_ERROR(__VA_ARGS__)
