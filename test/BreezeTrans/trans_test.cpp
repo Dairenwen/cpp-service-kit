@@ -1,5 +1,4 @@
 #include "BreezeTrans.hpp"
-
 #include <cstdlib>
 #include <filesystem>
 #include <string>
@@ -19,7 +18,7 @@ protected:
         directory = created;
     }
 
-    // 测试结束后清理生成的播放列表和分片。
+    // 每个测试结束后删除临时目录及其生成的文件
     void TearDown() override
     {
         if (!directory.empty())

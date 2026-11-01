@@ -35,3 +35,18 @@ target_link_libraries(breeze_rpc PUBLIC
     "${LEVELDB_LIBRARY}" OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB
     Threads::Threads ${CMAKE_DL_LIBS}
 )
+
+# 编译 BreezeEtcd 封装及其使用的日志、字符串工具。
+find_package(etcd-cpp-api CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+find_package(jsoncpp CONFIG REQUIRED)
+find_package(Boost REQUIRED)
+
+add_library(breeze_etcd STATIC BreezeEtcd.cpp BreezeLog.cpp BreezeUtil.cpp)
+target_include_directories(breeze_etcd PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${Boost_INCLUDE_DIRS}"
+)
+target_link_libraries(breeze_etcd PUBLIC
+    etcd-cpp-api spdlog::spdlog JsonCpp::JsonCpp Threads::Threads
+)

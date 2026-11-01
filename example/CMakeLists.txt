@@ -264,3 +264,23 @@ target_link_libraries(ffmpeg_hls PRIVATE
     "${AVFORMAT_LIBRARY}" "${AVCODEC_LIBRARY}" "${AVUTIL_LIBRARY}"
 )
 
+# ---------- etcd：写入和读取键值对 ----------
+
+find_package(etcd-cpp-api CONFIG REQUIRED)
+
+# 编译写入示例，生成 build/example/etcd_putdata。
+add_executable(etcd_putdata etcd/putdata.cpp)
+target_link_libraries(etcd_putdata PRIVATE etcd-cpp-api)
+
+# 编译读取示例，生成 build/example/etcd_getdata。
+add_executable(etcd_getdata etcd/getdata.cpp)
+target_link_libraries(etcd_getdata PRIVATE etcd-cpp-api)
+
+# 编译租约续期中断后重新注册的示例。
+add_executable(etcd_put_reconnect etcd/put_reconnect.cpp)
+target_link_libraries(etcd_put_reconnect PRIVATE etcd-cpp-api)
+
+# 编译前缀监听中断后重新连接的示例。
+add_executable(etcd_get_reconnect etcd/get_reconnect.cpp)
+target_link_libraries(etcd_get_reconnect PRIVATE etcd-cpp-api)
+

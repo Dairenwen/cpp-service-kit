@@ -735,7 +735,6 @@ void ClosureFactory::asyncCallback(const Object::ptr obj) {
 }
 ```
 
-
 ```cpp
 class RpcServerFactory {
     public:

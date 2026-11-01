@@ -1,6 +1,8 @@
 #include "BreezeUtil.hpp"
 #include "BreezeLog.hpp"
 
+#include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <fstream>
 #include <memory>
 #include <sstream>
@@ -8,6 +10,12 @@
 
 namespace BreezeUtil
 {
+    // 生成 UUID 字符串作为随机标识。
+    std::string Random::code()
+    {
+        return boost::uuids::to_string(boost::uuids::random_generator()());
+    }
+
     // 将 JSON 值转换为紧凑文本或带缩进的文本。
     std::optional<std::string> JSON::serialize(const Json::Value &value, bool styled)
     {

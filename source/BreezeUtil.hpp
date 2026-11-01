@@ -8,6 +8,14 @@
 
 namespace BreezeUtil
 {
+    // 生成服务节点使用的随机标识。
+    class Random
+    {
+    public:
+        // 返回 UUID 格式的随机字符串。
+        static std::string code();
+    };
+
     // 提供 JSON 值和字符串之间的转换。
     class JSON
     {

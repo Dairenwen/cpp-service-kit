@@ -32,6 +32,10 @@ add_custom_command(
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/BreezeRPC/cal.proto" protobuf::protoc
     VERBATIM
 )
+# 两个测试共用协议文件，确保并行构建时只生成一次。
+add_custom_target(breeze_test_proto_generate
+    DEPENDS "${BREEZE_TEST_PROTO_DIR}/cal.pb.cc" "${BREEZE_TEST_PROTO_DIR}/cal.pb.h"
+)
 
 # 编译测试程序并输出到 build/test。
 add_executable(breeze_rpc_test
@@ -39,6 +43,7 @@ add_executable(breeze_rpc_test
     BreezeRPC/server.cpp
     "${BREEZE_TEST_PROTO_DIR}/cal.pb.cc"
 )
+add_dependencies(breeze_rpc_test breeze_test_proto_generate)
 target_include_directories(breeze_rpc_test PRIVATE "${BREEZE_TEST_PROTO_DIR}")
 target_link_libraries(breeze_rpc_test PRIVATE breeze_rpc GTest::gtest_main)
 set_target_properties(breeze_rpc_test PROPERTIES
@@ -77,7 +82,33 @@ set_target_properties(breeze_trans_test PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
 )
 
+# ---------- BreezeEtcd 测试 ----------
+
+# 编译服务注册与发现测试，生成 build/test/breeze_etcd_test。
+add_executable(breeze_etcd_test BreezeEtcd/etcd_test.cpp)
+target_link_libraries(breeze_etcd_test PRIVATE breeze_etcd GTest::gtest_main)
+set_target_properties(breeze_etcd_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
+)
+
+# 复用加法服务和协议，编译 etcd 与 RPC 联合测试。
+add_executable(breeze_etcd_rpc_test
+    BreezeEtcd/rpc_test.cpp
+    BreezeRPC/server.cpp
+    "${BREEZE_TEST_PROTO_DIR}/cal.pb.cc"
+)
+add_dependencies(breeze_etcd_rpc_test breeze_test_proto_generate)
+target_include_directories(breeze_etcd_rpc_test PRIVATE "${BREEZE_TEST_PROTO_DIR}")
+target_link_libraries(breeze_etcd_rpc_test PRIVATE breeze_etcd breeze_rpc GTest::gtest_main)
+set_target_properties(breeze_etcd_rpc_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
+)
+
 # 使用 CTest 运行封装测试。
 enable_testing()
 add_test(NAME breeze_rpc_test COMMAND breeze_rpc_test)
 add_test(NAME breeze_trans_test COMMAND breeze_trans_test)
+add_test(NAME breeze_etcd_test COMMAND breeze_etcd_test)
+set_tests_properties(breeze_etcd_test PROPERTIES TIMEOUT 45)
+add_test(NAME breeze_etcd_rpc_test COMMAND breeze_etcd_rpc_test)
+set_tests_properties(breeze_etcd_rpc_test PROPERTIES TIMEOUT 45)
