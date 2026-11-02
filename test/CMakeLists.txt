@@ -104,6 +104,15 @@ set_target_properties(breeze_etcd_rpc_test PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
 )
 
+# ---------- BreezeMQ 测试 ----------
+
+# 编译消息发布、订阅和延迟消息测试
+add_executable(breeze_mq_test BreezeMQ/mq_test.cpp)
+target_link_libraries(breeze_mq_test PRIVATE breeze_mq GTest::gtest_main)
+set_target_properties(breeze_mq_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
+)
+
 # 使用 CTest 运行封装测试。
 enable_testing()
 add_test(NAME breeze_rpc_test COMMAND breeze_rpc_test)
@@ -112,3 +121,6 @@ add_test(NAME breeze_etcd_test COMMAND breeze_etcd_test)
 set_tests_properties(breeze_etcd_test PROPERTIES TIMEOUT 45)
 add_test(NAME breeze_etcd_rpc_test COMMAND breeze_etcd_rpc_test)
 set_tests_properties(breeze_etcd_rpc_test PROPERTIES TIMEOUT 45)
+add_test(NAME breeze_mq_direct_test COMMAND breeze_mq_test --gtest_filter=BreezeMQTest.DirectMessage)
+add_test(NAME breeze_mq_delayed_test COMMAND breeze_mq_test --gtest_filter=BreezeMQTest.DelayedMessage)
+set_tests_properties(breeze_mq_direct_test breeze_mq_delayed_test PROPERTIES TIMEOUT 15)

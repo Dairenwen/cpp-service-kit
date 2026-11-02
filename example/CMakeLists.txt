@@ -284,3 +284,29 @@ target_link_libraries(etcd_put_reconnect PRIVATE etcd-cpp-api)
 add_executable(etcd_get_reconnect etcd/get_reconnect.cpp)
 target_link_libraries(etcd_get_reconnect PRIVATE etcd-cpp-api)
 
+# ---------- AMQP-CPP：向 RabbitMQ 发送消息 ----------
+
+find_path(AMQPCPP_INCLUDE_DIR amqpcpp.h REQUIRED)
+find_path(LIBEV_INCLUDE_DIR ev.h REQUIRED)
+find_library(AMQPCPP_LIBRARY NAMES amqpcpp REQUIRED)
+find_library(LIBEV_LIBRARY NAMES ev REQUIRED)
+
+# 编译生产者示例，生成 build/example/amqp_producer
+add_executable(amqp_producer amqp/producer.cpp)
+target_include_directories(amqp_producer PRIVATE "${AMQPCPP_INCLUDE_DIR}" "${LIBEV_INCLUDE_DIR}")
+target_link_libraries(amqp_producer PRIVATE "${AMQPCPP_LIBRARY}" "${LIBEV_LIBRARY}" Threads::Threads)
+
+# 编译消费者示例，生成 build/example/amqp_consumer。
+add_executable(amqp_consumer amqp/consumer.cpp)
+target_include_directories(amqp_consumer PRIVATE "${AMQPCPP_INCLUDE_DIR}" "${LIBEV_INCLUDE_DIR}")
+target_link_libraries(amqp_consumer PRIVATE "${AMQPCPP_LIBRARY}" "${LIBEV_LIBRARY}" Threads::Threads)
+
+# 编译死信队列生产者和消费者示例。
+add_executable(amqp_dlx_producer amqp/dlx_producer.cpp)
+target_include_directories(amqp_dlx_producer PRIVATE "${AMQPCPP_INCLUDE_DIR}" "${LIBEV_INCLUDE_DIR}")
+target_link_libraries(amqp_dlx_producer PRIVATE "${AMQPCPP_LIBRARY}" "${LIBEV_LIBRARY}" Threads::Threads)
+
+add_executable(amqp_dlx_consumer amqp/dlx_consumer.cpp)
+target_include_directories(amqp_dlx_consumer PRIVATE "${AMQPCPP_INCLUDE_DIR}" "${LIBEV_INCLUDE_DIR}")
+target_link_libraries(amqp_dlx_consumer PRIVATE "${AMQPCPP_LIBRARY}" "${LIBEV_LIBRARY}" Threads::Threads)
+

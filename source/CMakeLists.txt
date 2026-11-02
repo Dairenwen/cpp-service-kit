@@ -17,6 +17,14 @@ find_path(BRPC_INCLUDE_DIR brpc/server.h REQUIRED)
 find_library(BRPC_LIBRARY NAMES brpc REQUIRED)
 find_library(LEVELDB_LIBRARY NAMES leveldb REQUIRED)
 find_package(OpenSSL REQUIRED)
+find_package(etcd-cpp-api CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+find_package(jsoncpp CONFIG REQUIRED)
+find_package(Boost REQUIRED)
+find_path(AMQPCPP_INCLUDE_DIR amqpcpp.h REQUIRED)
+find_path(LIBEV_INCLUDE_DIR ev.h REQUIRED)
+find_library(AMQPCPP_LIBRARY NAMES amqpcpp REQUIRED)
+find_library(LIBEV_LIBRARY NAMES ev REQUIRED)
 find_package(ZLIB REQUIRED)
 
 # 封装库输出到 build/source
@@ -37,10 +45,6 @@ target_link_libraries(breeze_rpc PUBLIC
 )
 
 # 编译 BreezeEtcd 封装及其使用的日志、字符串工具。
-find_package(etcd-cpp-api CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-find_package(jsoncpp CONFIG REQUIRED)
-find_package(Boost REQUIRED)
 
 add_library(breeze_etcd STATIC BreezeEtcd.cpp BreezeLog.cpp BreezeUtil.cpp)
 target_include_directories(breeze_etcd PUBLIC
@@ -50,3 +54,11 @@ target_include_directories(breeze_etcd PUBLIC
 target_link_libraries(breeze_etcd PUBLIC
     etcd-cpp-api spdlog::spdlog JsonCpp::JsonCpp Threads::Threads
 )
+
+# 编译基于 AMQP-CPP 和 libev 的消息队列封装。
+
+add_library(breeze_mq STATIC BreezeMQ.cpp BreezeLog.cpp)
+target_include_directories(breeze_mq PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}" "${AMQPCPP_INCLUDE_DIR}" "${LIBEV_INCLUDE_DIR}"
+)
+target_link_libraries(breeze_mq PUBLIC "${AMQPCPP_LIBRARY}" "${LIBEV_LIBRARY}" spdlog::spdlog Threads::Threads)
