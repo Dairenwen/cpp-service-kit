@@ -310,3 +310,21 @@ add_executable(amqp_dlx_consumer amqp/dlx_consumer.cpp)
 target_include_directories(amqp_dlx_consumer PRIVATE "${AMQPCPP_INCLUDE_DIR}" "${LIBEV_INCLUDE_DIR}")
 target_link_libraries(amqp_dlx_consumer PRIVATE "${AMQPCPP_LIBRARY}" "${LIBEV_LIBRARY}" Threads::Threads)
 
+
+# ---------- FastDFS：文件和缓冲区上传、下载及删除 ----------
+# 查找客户端与公共库的头文件和链接库；没有安装时不影响其他示例构建。
+find_path(FASTDFS_INCLUDE_DIR fastdfs/fdfs_client.h)
+find_path(FASTCOMMON_INCLUDE_DIR fastcommon/logger.h)
+find_library(FASTDFS_CLIENT_LIBRARY NAMES fdfsclient)
+find_library(FASTCOMMON_LIBRARY NAMES fastcommon)
+
+if(FASTDFS_INCLUDE_DIR AND FASTCOMMON_INCLUDE_DIR AND FASTDFS_CLIENT_LIBRARY AND FASTCOMMON_LIBRARY)
+    # 分别生成 fastdfs_upload、fastdfs_download 和 fastdfs_remove。
+    foreach(operation upload download remove)
+        add_executable(fastdfs_${operation} fastdfs/${operation}.cc)
+        target_include_directories(fastdfs_${operation} PRIVATE "${FASTDFS_INCLUDE_DIR}" "${FASTCOMMON_INCLUDE_DIR}")
+        target_link_libraries(fastdfs_${operation} PRIVATE "${FASTDFS_CLIENT_LIBRARY}" "${FASTCOMMON_LIBRARY}" Threads::Threads)
+    endforeach()
+else()
+    message(STATUS "FastDFS 客户端依赖未找到，跳过 FastDFS 示例")
+endif()

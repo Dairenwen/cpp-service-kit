@@ -62,3 +62,20 @@ target_include_directories(breeze_mq PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}" "${AMQPCPP_INCLUDE_DIR}" "${LIBEV_INCLUDE_DIR}"
 )
 target_link_libraries(breeze_mq PUBLIC "${AMQPCPP_LIBRARY}" "${LIBEV_LIBRARY}" spdlog::spdlog Threads::Threads)
+
+# 编译FastDFS 客户端封装
+find_path(FASTDFS_INCLUDE_DIR fastdfs/fdfs_client.h)
+find_path(FASTCOMMON_INCLUDE_DIR fastcommon/logger.h)
+find_library(FASTDFS_CLIENT_LIBRARY NAMES fdfsclient)
+find_library(FASTCOMMON_LIBRARY NAMES fastcommon)
+if(FASTDFS_INCLUDE_DIR AND FASTCOMMON_INCLUDE_DIR AND FASTDFS_CLIENT_LIBRARY AND FASTCOMMON_LIBRARY)
+    add_library(breeze_fdfs STATIC BreezeFDFS.cpp BreezeLog.cpp)
+    target_include_directories(breeze_fdfs PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}" "${FASTDFS_INCLUDE_DIR}" "${FASTCOMMON_INCLUDE_DIR}"
+    )
+    target_link_libraries(breeze_fdfs PUBLIC
+        "${FASTDFS_CLIENT_LIBRARY}" "${FASTCOMMON_LIBRARY}" spdlog::spdlog Threads::Threads
+    )
+else()
+    message(STATUS "FastDFS 客户端依赖未找到，跳过 FastDFS 封装")
+endif()
