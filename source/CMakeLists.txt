@@ -79,3 +79,19 @@ if(FASTDFS_INCLUDE_DIR AND FASTCOMMON_INCLUDE_DIR AND FASTDFS_CLIENT_LIBRARY AND
 else()
     message(STATUS "FastDFS 客户端依赖未找到，跳过 FastDFS 封装")
 endif()
+
+# 编译 Redis++ 客户端封装。
+find_path(REDIS_PLUS_PLUS_INCLUDE_DIR sw/redis++/redis.h)
+find_library(REDIS_PLUS_PLUS_LIBRARY NAMES redis++)
+find_library(HIREDIS_LIBRARY NAMES hiredis)
+if(REDIS_PLUS_PLUS_INCLUDE_DIR AND REDIS_PLUS_PLUS_LIBRARY AND HIREDIS_LIBRARY)
+    add_library(breeze_redis STATIC BreezeRedis.cpp)
+    target_include_directories(breeze_redis PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}" "${REDIS_PLUS_PLUS_INCLUDE_DIR}"
+    )
+    target_link_libraries(breeze_redis PUBLIC
+        "${REDIS_PLUS_PLUS_LIBRARY}" "${HIREDIS_LIBRARY}" Threads::Threads
+    )
+else()
+    message(STATUS "Redis++ 或 hiredis 未找到，跳过 Redis 封装")
+endif()

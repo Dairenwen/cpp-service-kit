@@ -113,6 +113,17 @@ set_target_properties(breeze_mq_test PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
 )
 
+# ---------- BreezeRedis 测试 ----------
+
+# 编译 Redis 连接和读写测试，生成 build/test/breeze_redis_test。
+if(TARGET breeze_redis)
+    add_executable(breeze_redis_test BreezeRedis/redis_test.cpp)
+    target_link_libraries(breeze_redis_test PRIVATE breeze_redis GTest::gtest_main)
+    set_target_properties(breeze_redis_test PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
+    )
+endif()
+
 # ---------- FastDFS 封装集成测试 ----------
 
 # 需要可访问的 Tracker 和 Storage；可用 FDFS_TRACKER 指定 Tracker 地址。
@@ -135,9 +146,8 @@ set_tests_properties(breeze_etcd_rpc_test PROPERTIES TIMEOUT 45)
 add_test(NAME breeze_mq_direct_test COMMAND breeze_mq_test --gtest_filter=BreezeMQTest.DirectMessage)
 add_test(NAME breeze_mq_delayed_test COMMAND breeze_mq_test --gtest_filter=BreezeMQTest.DelayedMessage)
 set_tests_properties(breeze_mq_direct_test breeze_mq_delayed_test PROPERTIES TIMEOUT 15)
+add_test(NAME breeze_redis_test COMMAND breeze_redis_test)
+set_tests_properties(breeze_redis_test PROPERTIES TIMEOUT 15)
+add_test(NAME breeze_fdfs_test COMMAND breeze_fdfs_test)
+set_tests_properties(breeze_fdfs_test PROPERTIES TIMEOUT 90)
 
-# 只在构建了 FastDFS 封装时注册依赖外部服务的集成测试。
-if(TARGET breeze_fdfs_test)
-    add_test(NAME breeze_fdfs_test COMMAND breeze_fdfs_test)
-    set_tests_properties(breeze_fdfs_test PROPERTIES TIMEOUT 90)
-endif()

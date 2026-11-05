@@ -328,3 +328,24 @@ if(FASTDFS_INCLUDE_DIR AND FASTCOMMON_INCLUDE_DIR AND FASTDFS_CLIENT_LIBRARY AND
 else()
     message(STATUS "FastDFS 客户端依赖未找到，跳过 FastDFS 示例")
 endif()
+
+# ---------- Redis++：Redis 操作示例 ----------
+find_path(REDIS_PLUS_PLUS_INCLUDE_DIR sw/redis++/redis.h)
+find_library(REDIS_PLUS_PLUS_LIBRARY NAMES redis++)
+find_library(HIREDIS_LIBRARY NAMES hiredis)
+if(REDIS_PLUS_PLUS_INCLUDE_DIR AND REDIS_PLUS_PLUS_LIBRARY AND HIREDIS_LIBRARY)
+    # 每个文件都有独立的 main，分别生成可执行程序。
+    foreach(operation string list hash set zset expired transaction pipeline watch)
+        add_executable(redis_${operation} redis/${operation}.cc)
+        target_include_directories(redis_${operation} PRIVATE "${REDIS_PLUS_PLUS_INCLUDE_DIR}")
+        target_link_libraries(redis_${operation} PRIVATE
+            "${REDIS_PLUS_PLUS_LIBRARY}" "${HIREDIS_LIBRARY}" Threads::Threads
+        )
+        # 图片中的 assert 内含写入等操作，保留断言以免 Release 构建跳过操作。
+        if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+            target_compile_options(redis_${operation} PRIVATE -UNDEBUG)
+        endif()
+    endforeach()
+else()
+    message(STATUS "Redis++ 或 hiredis 未找到，跳过 Redis 示例")
+endif()
