@@ -95,3 +95,19 @@ if(REDIS_PLUS_PLUS_INCLUDE_DIR AND REDIS_PLUS_PLUS_LIBRARY AND HIREDIS_LIBRARY)
 else()
     message(STATUS "Redis++ 或 hiredis 未找到，跳过 Redis 封装")
 endif()
+
+# 编译 ODB MySQL 连接池封装。
+find_path(ODB_INCLUDE_DIR odb/mysql/database.hxx)
+find_library(ODB_LIBRARY NAMES odb)
+find_library(ODB_MYSQL_LIBRARY NAMES odb-mysql)
+if(ODB_INCLUDE_DIR AND ODB_LIBRARY AND ODB_MYSQL_LIBRARY)
+    add_library(breeze_odb STATIC BreezeODB.cpp)
+    target_include_directories(breeze_odb PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}" "${ODB_INCLUDE_DIR}"
+    )
+    target_link_libraries(breeze_odb PUBLIC
+        "${ODB_MYSQL_LIBRARY}" "${ODB_LIBRARY}" Threads::Threads
+    )
+else()
+    message(STATUS "ODB 或 ODB MySQL 未找到，跳过 ODB 封装")
+endif()

@@ -135,6 +135,27 @@ if(TARGET breeze_fdfs)
     )
 endif()
 
+# ---------- ODB MySQL 封装测试 ----------
+find_program(ODB_COMPILER NAMES odb)
+if(TARGET breeze_odb AND ODB_COMPILER)
+    set(BREEZE_ODB_TEST_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/breeze_odb_test")
+    file(MAKE_DIRECTORY "${BREEZE_ODB_TEST_DIR}")
+    add_custom_command(
+        OUTPUT "${BREEZE_ODB_TEST_DIR}/test_record-odb.cxx" "${BREEZE_ODB_TEST_DIR}/test_record-odb.hxx"
+        BYPRODUCTS "${BREEZE_ODB_TEST_DIR}/test_record-odb.ixx"
+        COMMAND "${ODB_COMPILER}" -d mysql --std c++11 --generate-query
+            --output-dir "${BREEZE_ODB_TEST_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/BreezeODB/test_record.hxx"
+        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/BreezeODB/test_record.hxx"
+        VERBATIM
+    )
+    add_executable(breeze_odb_test BreezeODB/odb_test.cpp "${BREEZE_ODB_TEST_DIR}/test_record-odb.cxx")
+    target_include_directories(breeze_odb_test PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/BreezeODB" "${BREEZE_ODB_TEST_DIR}"
+    )
+    target_link_libraries(breeze_odb_test PRIVATE breeze_odb GTest::gtest_main)
+    set_target_properties(breeze_odb_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test")
+endif()
+
 # 使用 CTest 运行封装测试。
 enable_testing()
 add_test(NAME breeze_rpc_test COMMAND breeze_rpc_test)
@@ -150,4 +171,6 @@ add_test(NAME breeze_redis_test COMMAND breeze_redis_test)
 set_tests_properties(breeze_redis_test PROPERTIES TIMEOUT 15)
 add_test(NAME breeze_fdfs_test COMMAND breeze_fdfs_test)
 set_tests_properties(breeze_fdfs_test PROPERTIES TIMEOUT 90)
+add_test(NAME breeze_odb_test COMMAND breeze_odb_test)
+set_tests_properties(breeze_odb_test PROPERTIES TIMEOUT 15)
 

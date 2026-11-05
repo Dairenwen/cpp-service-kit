@@ -341,11 +341,45 @@ if(REDIS_PLUS_PLUS_INCLUDE_DIR AND REDIS_PLUS_PLUS_LIBRARY AND HIREDIS_LIBRARY)
         target_link_libraries(redis_${operation} PRIVATE
             "${REDIS_PLUS_PLUS_LIBRARY}" "${HIREDIS_LIBRARY}" Threads::Threads
         )
-        # 图片中的 assert 内含写入等操作，保留断言以免 Release 构建跳过操作。
         if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
             target_compile_options(redis_${operation} PRIVATE -UNDEBUG)
         endif()
     endforeach()
 else()
     message(STATUS "Redis++ 或 hiredis 未找到，跳过 Redis 示例")
+endif()
+
+# ---------- ODB：MySQL 对象映射和查询示例 ----------
+find_program(ODB_COMPILER NAMES odb)
+find_path(ODB_INCLUDE_DIR odb/core.hxx)
+find_library(ODB_LIBRARY NAMES odb)
+find_library(ODB_MYSQL_LIBRARY NAMES odb-mysql)
+find_library(ODB_BOOST_LIBRARY NAMES odb-boost)
+
+if(ODB_COMPILER AND ODB_INCLUDE_DIR AND ODB_LIBRARY AND ODB_MYSQL_LIBRARY AND ODB_BOOST_LIBRARY)
+    foreach(example_name crud group limit native view)
+        set(odb_model student)
+        set(odb_header student.h)
+        set(odb_source "${example_name}.cc")
+        # 各示例模型同名，生成文件必须分别保存在独立目录
+        set(odb_generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated/odb_${example_name}")
+        file(MAKE_DIRECTORY "${odb_generated_dir}")
+        add_custom_command(
+            OUTPUT "${odb_generated_dir}/${odb_model}-odb.cxx" "${odb_generated_dir}/${odb_model}-odb.hxx"
+            BYPRODUCTS "${odb_generated_dir}/${odb_model}-odb.ixx" "${odb_generated_dir}/${odb_model}.sql"
+            COMMAND "${ODB_COMPILER}" -d mysql --std c++11 --generate-query --generate-schema
+                --profile boost/date-time --output-dir "${odb_generated_dir}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/odb/${example_name}/${odb_header}"
+            DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/odb/${example_name}/${odb_header}"
+            VERBATIM
+        )
+        add_executable(odb_${example_name}
+            "odb/${example_name}/${odb_source}" "${odb_generated_dir}/${odb_model}-odb.cxx")
+        target_include_directories(odb_${example_name} PRIVATE
+            "${CMAKE_CURRENT_SOURCE_DIR}/odb/${example_name}" "${odb_generated_dir}" "${ODB_INCLUDE_DIR}")
+        target_link_libraries(odb_${example_name} PRIVATE
+            "${ODB_MYSQL_LIBRARY}" "${ODB_BOOST_LIBRARY}" "${ODB_LIBRARY}" Threads::Threads)
+    endforeach()
+else()
+    message(STATUS "ODB 编译器或依赖未找到，跳过 ODB 示例")
 endif()
