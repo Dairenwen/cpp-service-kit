@@ -318,36 +318,31 @@ find_path(FASTCOMMON_INCLUDE_DIR fastcommon/logger.h)
 find_library(FASTDFS_CLIENT_LIBRARY NAMES fdfsclient)
 find_library(FASTCOMMON_LIBRARY NAMES fastcommon)
 
-if(FASTDFS_INCLUDE_DIR AND FASTCOMMON_INCLUDE_DIR AND FASTDFS_CLIENT_LIBRARY AND FASTCOMMON_LIBRARY)
-    # 分别生成 fastdfs_upload、fastdfs_download 和 fastdfs_remove。
-    foreach(operation upload download remove)
-        add_executable(fastdfs_${operation} fastdfs/${operation}.cc)
-        target_include_directories(fastdfs_${operation} PRIVATE "${FASTDFS_INCLUDE_DIR}" "${FASTCOMMON_INCLUDE_DIR}")
-        target_link_libraries(fastdfs_${operation} PRIVATE "${FASTDFS_CLIENT_LIBRARY}" "${FASTCOMMON_LIBRARY}" Threads::Threads)
-    endforeach()
-else()
-    message(STATUS "FastDFS 客户端依赖未找到，跳过 FastDFS 示例")
-endif()
+# 分别生成 fastdfs_upload、fastdfs_download 和 fastdfs_remove。
+foreach(operation upload download remove)
+    add_executable(fastdfs_${operation} fastdfs/${operation}.cc)
+    target_include_directories(fastdfs_${operation} PRIVATE "${FASTDFS_INCLUDE_DIR}" "${FASTCOMMON_INCLUDE_DIR}")
+    target_link_libraries(fastdfs_${operation} PRIVATE "${FASTDFS_CLIENT_LIBRARY}" "${FASTCOMMON_LIBRARY}" Threads::Threads)
+endforeach()
+
 
 # ---------- Redis++：Redis 操作示例 ----------
 find_path(REDIS_PLUS_PLUS_INCLUDE_DIR sw/redis++/redis.h)
 find_library(REDIS_PLUS_PLUS_LIBRARY NAMES redis++)
 find_library(HIREDIS_LIBRARY NAMES hiredis)
-if(REDIS_PLUS_PLUS_INCLUDE_DIR AND REDIS_PLUS_PLUS_LIBRARY AND HIREDIS_LIBRARY)
-    # 每个文件都有独立的 main，分别生成可执行程序。
-    foreach(operation string list hash set zset expired transaction pipeline watch)
-        add_executable(redis_${operation} redis/${operation}.cc)
-        target_include_directories(redis_${operation} PRIVATE "${REDIS_PLUS_PLUS_INCLUDE_DIR}")
-        target_link_libraries(redis_${operation} PRIVATE
-            "${REDIS_PLUS_PLUS_LIBRARY}" "${HIREDIS_LIBRARY}" Threads::Threads
-        )
-        if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-            target_compile_options(redis_${operation} PRIVATE -UNDEBUG)
-        endif()
-    endforeach()
-else()
-    message(STATUS "Redis++ 或 hiredis 未找到，跳过 Redis 示例")
-endif()
+
+# 每个文件都有独立的 main，分别生成可执行程序。
+foreach(operation string list hash set zset expired transaction pipeline watch)
+    add_executable(redis_${operation} redis/${operation}.cc)
+    target_include_directories(redis_${operation} PRIVATE "${REDIS_PLUS_PLUS_INCLUDE_DIR}")
+    target_link_libraries(redis_${operation} PRIVATE
+        "${REDIS_PLUS_PLUS_LIBRARY}" "${HIREDIS_LIBRARY}" Threads::Threads
+    )
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(redis_${operation} PRIVATE -UNDEBUG)
+    endif()
+endforeach()
+
 
 # ---------- ODB：MySQL 对象映射和查询示例 ----------
 find_program(ODB_COMPILER NAMES odb)
@@ -356,30 +351,40 @@ find_library(ODB_LIBRARY NAMES odb)
 find_library(ODB_MYSQL_LIBRARY NAMES odb-mysql)
 find_library(ODB_BOOST_LIBRARY NAMES odb-boost)
 
-if(ODB_COMPILER AND ODB_INCLUDE_DIR AND ODB_LIBRARY AND ODB_MYSQL_LIBRARY AND ODB_BOOST_LIBRARY)
-    foreach(example_name crud group limit native view)
-        set(odb_model student)
-        set(odb_header student.h)
-        set(odb_source "${example_name}.cc")
-        # 各示例模型同名，生成文件必须分别保存在独立目录
-        set(odb_generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated/odb_${example_name}")
-        file(MAKE_DIRECTORY "${odb_generated_dir}")
-        add_custom_command(
-            OUTPUT "${odb_generated_dir}/${odb_model}-odb.cxx" "${odb_generated_dir}/${odb_model}-odb.hxx"
-            BYPRODUCTS "${odb_generated_dir}/${odb_model}-odb.ixx" "${odb_generated_dir}/${odb_model}.sql"
-            COMMAND "${ODB_COMPILER}" -d mysql --std c++11 --generate-query --generate-schema
-                --profile boost/date-time --output-dir "${odb_generated_dir}"
-                "${CMAKE_CURRENT_SOURCE_DIR}/odb/${example_name}/${odb_header}"
-            DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/odb/${example_name}/${odb_header}"
-            VERBATIM
-        )
-        add_executable(odb_${example_name}
-            "odb/${example_name}/${odb_source}" "${odb_generated_dir}/${odb_model}-odb.cxx")
-        target_include_directories(odb_${example_name} PRIVATE
-            "${CMAKE_CURRENT_SOURCE_DIR}/odb/${example_name}" "${odb_generated_dir}" "${ODB_INCLUDE_DIR}")
-        target_link_libraries(odb_${example_name} PRIVATE
-            "${ODB_MYSQL_LIBRARY}" "${ODB_BOOST_LIBRARY}" "${ODB_LIBRARY}" Threads::Threads)
-    endforeach()
-else()
-    message(STATUS "ODB 编译器或依赖未找到，跳过 ODB 示例")
-endif()
+
+foreach(example_name crud group limit native view)
+    set(odb_model student)
+    set(odb_header student.h)
+    set(odb_source "${example_name}.cc")
+    # 各示例模型同名，生成文件必须分别保存在独立目录
+    set(odb_generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated/odb_${example_name}")
+    file(MAKE_DIRECTORY "${odb_generated_dir}")
+    add_custom_command(
+        OUTPUT "${odb_generated_dir}/${odb_model}-odb.cxx" "${odb_generated_dir}/${odb_model}-odb.hxx"
+        BYPRODUCTS "${odb_generated_dir}/${odb_model}-odb.ixx" "${odb_generated_dir}/${odb_model}.sql"
+        COMMAND "${ODB_COMPILER}" -d mysql --std c++11 --generate-query --generate-schema
+            --profile boost/date-time --output-dir "${odb_generated_dir}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/odb/${example_name}/${odb_header}"
+        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/odb/${example_name}/${odb_header}"
+        VERBATIM
+    )
+    add_executable(odb_${example_name}
+        "odb/${example_name}/${odb_source}" "${odb_generated_dir}/${odb_model}-odb.cxx")
+    target_include_directories(odb_${example_name} PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/odb/${example_name}" "${odb_generated_dir}" "${ODB_INCLUDE_DIR}")
+    target_link_libraries(odb_${example_name} PRIVATE
+        "${ODB_MYSQL_LIBRARY}" "${ODB_BOOST_LIBRARY}" "${ODB_LIBRARY}" Threads::Threads)
+endforeach()
+
+
+# ---------- Elasticsearch：索引和文档操作 ----------
+find_path(ELASTICLIENT_INCLUDE_DIR elasticlient/client.h)
+find_path(CPR_INCLUDE_DIR cpr/response.h)
+find_library(ELASTICLIENT_LIBRARY NAMES elasticlient)
+find_library(CPR_LIBRARY NAMES cpr)
+
+add_executable(elasticsearch_client elasticsearch/client.cc)
+target_include_directories(elasticsearch_client PRIVATE "${ELASTICLIENT_INCLUDE_DIR}" "${CPR_INCLUDE_DIR}")
+target_link_libraries(elasticsearch_client PRIVATE
+    "${ELASTICLIENT_LIBRARY}" "${CPR_LIBRARY}" JsonCpp::JsonCpp Threads::Threads
+)
