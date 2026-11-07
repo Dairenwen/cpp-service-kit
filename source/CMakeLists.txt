@@ -68,46 +68,56 @@ find_path(FASTDFS_INCLUDE_DIR fastdfs/fdfs_client.h)
 find_path(FASTCOMMON_INCLUDE_DIR fastcommon/logger.h)
 find_library(FASTDFS_CLIENT_LIBRARY NAMES fdfsclient)
 find_library(FASTCOMMON_LIBRARY NAMES fastcommon)
-if(FASTDFS_INCLUDE_DIR AND FASTCOMMON_INCLUDE_DIR AND FASTDFS_CLIENT_LIBRARY AND FASTCOMMON_LIBRARY)
-    add_library(breeze_fdfs STATIC BreezeFDFS.cpp BreezeLog.cpp)
-    target_include_directories(breeze_fdfs PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}" "${FASTDFS_INCLUDE_DIR}" "${FASTCOMMON_INCLUDE_DIR}"
-    )
-    target_link_libraries(breeze_fdfs PUBLIC
-        "${FASTDFS_CLIENT_LIBRARY}" "${FASTCOMMON_LIBRARY}" spdlog::spdlog Threads::Threads
-    )
-else()
-    message(STATUS "FastDFS 客户端依赖未找到，跳过 FastDFS 封装")
-endif()
+
+add_library(breeze_fdfs STATIC BreezeFDFS.cpp BreezeLog.cpp)
+target_include_directories(breeze_fdfs PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}" "${FASTDFS_INCLUDE_DIR}" "${FASTCOMMON_INCLUDE_DIR}"
+)
+target_link_libraries(breeze_fdfs PUBLIC
+    "${FASTDFS_CLIENT_LIBRARY}" "${FASTCOMMON_LIBRARY}" spdlog::spdlog Threads::Threads
+)
+
 
 # 编译 Redis++ 客户端封装。
 find_path(REDIS_PLUS_PLUS_INCLUDE_DIR sw/redis++/redis.h)
 find_library(REDIS_PLUS_PLUS_LIBRARY NAMES redis++)
 find_library(HIREDIS_LIBRARY NAMES hiredis)
-if(REDIS_PLUS_PLUS_INCLUDE_DIR AND REDIS_PLUS_PLUS_LIBRARY AND HIREDIS_LIBRARY)
-    add_library(breeze_redis STATIC BreezeRedis.cpp)
-    target_include_directories(breeze_redis PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}" "${REDIS_PLUS_PLUS_INCLUDE_DIR}"
-    )
-    target_link_libraries(breeze_redis PUBLIC
-        "${REDIS_PLUS_PLUS_LIBRARY}" "${HIREDIS_LIBRARY}" Threads::Threads
-    )
-else()
-    message(STATUS "Redis++ 或 hiredis 未找到，跳过 Redis 封装")
-endif()
+
+add_library(breeze_redis STATIC BreezeRedis.cpp)
+target_include_directories(breeze_redis PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}" "${REDIS_PLUS_PLUS_INCLUDE_DIR}"
+)
+target_link_libraries(breeze_redis PUBLIC
+    "${REDIS_PLUS_PLUS_LIBRARY}" "${HIREDIS_LIBRARY}" Threads::Threads
+)
+
 
 # 编译 ODB MySQL 连接池封装。
 find_path(ODB_INCLUDE_DIR odb/mysql/database.hxx)
 find_library(ODB_LIBRARY NAMES odb)
 find_library(ODB_MYSQL_LIBRARY NAMES odb-mysql)
-if(ODB_INCLUDE_DIR AND ODB_LIBRARY AND ODB_MYSQL_LIBRARY)
-    add_library(breeze_odb STATIC BreezeODB.cpp)
-    target_include_directories(breeze_odb PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}" "${ODB_INCLUDE_DIR}"
-    )
-    target_link_libraries(breeze_odb PUBLIC
-        "${ODB_MYSQL_LIBRARY}" "${ODB_LIBRARY}" Threads::Threads
-    )
-else()
-    message(STATUS "ODB 或 ODB MySQL 未找到，跳过 ODB 封装")
-endif()
+
+add_library(breeze_odb STATIC BreezeODB.cpp)
+target_include_directories(breeze_odb PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}" "${ODB_INCLUDE_DIR}"
+)
+target_link_libraries(breeze_odb PUBLIC
+    "${ODB_MYSQL_LIBRARY}" "${ODB_LIBRARY}" Threads::Threads
+)
+
+# Elasticsearch：复用项目中的 JSON 工具和日志模块。
+find_path(ELASTICLIENT_INCLUDE_DIR elasticlient/client.h)
+find_path(CPR_INCLUDE_DIR cpr/response.h)
+find_library(ELASTICLIENT_LIBRARY NAMES elasticlient)
+find_library(CPR_LIBRARY NAMES cpr)
+
+add_library(breeze_elastic STATIC
+    BreezeElastic.cpp BreezeUtil.cpp BreezeLog.cpp
+)
+target_include_directories(breeze_elastic PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}" "${ELASTICLIENT_INCLUDE_DIR}" "${CPR_INCLUDE_DIR}"
+)
+target_link_libraries(breeze_elastic PUBLIC
+    "${ELASTICLIENT_LIBRARY}" "${CPR_LIBRARY}"
+    JsonCpp::JsonCpp spdlog::spdlog Threads::Threads
+)
