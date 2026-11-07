@@ -116,45 +116,52 @@ set_target_properties(breeze_mq_test PROPERTIES
 # ---------- BreezeRedis 测试 ----------
 
 # 编译 Redis 连接和读写测试，生成 build/test/breeze_redis_test。
-if(TARGET breeze_redis)
-    add_executable(breeze_redis_test BreezeRedis/redis_test.cpp)
-    target_link_libraries(breeze_redis_test PRIVATE breeze_redis GTest::gtest_main)
-    set_target_properties(breeze_redis_test PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
-    )
-endif()
+
+add_executable(breeze_redis_test BreezeRedis/redis_test.cpp)
+target_link_libraries(breeze_redis_test PRIVATE breeze_redis GTest::gtest_main)
+set_target_properties(breeze_redis_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
+)
+
 
 # ---------- FastDFS 封装集成测试 ----------
 
 # 需要可访问的 Tracker 和 Storage；可用 FDFS_TRACKER 指定 Tracker 地址。
-if(TARGET breeze_fdfs)
-    add_executable(breeze_fdfs_test BreezeFDFS/fdfs_test.cpp)
-    target_link_libraries(breeze_fdfs_test PRIVATE breeze_fdfs GTest::gtest)
-    set_target_properties(breeze_fdfs_test PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
-    )
-endif()
+add_executable(breeze_fdfs_test BreezeFDFS/fdfs_test.cpp)
+target_link_libraries(breeze_fdfs_test PRIVATE breeze_fdfs GTest::gtest)
+set_target_properties(breeze_fdfs_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
+)
 
 # ---------- ODB MySQL 封装测试 ----------
 find_program(ODB_COMPILER NAMES odb)
-if(TARGET breeze_odb AND ODB_COMPILER)
-    set(BREEZE_ODB_TEST_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/breeze_odb_test")
-    file(MAKE_DIRECTORY "${BREEZE_ODB_TEST_DIR}")
-    add_custom_command(
-        OUTPUT "${BREEZE_ODB_TEST_DIR}/test_record-odb.cxx" "${BREEZE_ODB_TEST_DIR}/test_record-odb.hxx"
-        BYPRODUCTS "${BREEZE_ODB_TEST_DIR}/test_record-odb.ixx"
-        COMMAND "${ODB_COMPILER}" -d mysql --std c++11 --generate-query
-            --output-dir "${BREEZE_ODB_TEST_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/BreezeODB/test_record.hxx"
-        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/BreezeODB/test_record.hxx"
-        VERBATIM
-    )
-    add_executable(breeze_odb_test BreezeODB/odb_test.cpp "${BREEZE_ODB_TEST_DIR}/test_record-odb.cxx")
-    target_include_directories(breeze_odb_test PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/BreezeODB" "${BREEZE_ODB_TEST_DIR}"
-    )
-    target_link_libraries(breeze_odb_test PRIVATE breeze_odb GTest::gtest_main)
-    set_target_properties(breeze_odb_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test")
-endif()
+
+set(BREEZE_ODB_TEST_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/breeze_odb_test")
+file(MAKE_DIRECTORY "${BREEZE_ODB_TEST_DIR}")
+add_custom_command(
+    OUTPUT "${BREEZE_ODB_TEST_DIR}/test_record-odb.cxx" "${BREEZE_ODB_TEST_DIR}/test_record-odb.hxx"
+    BYPRODUCTS "${BREEZE_ODB_TEST_DIR}/test_record-odb.ixx"
+    COMMAND "${ODB_COMPILER}" -d mysql --std c++11 --generate-query
+        --output-dir "${BREEZE_ODB_TEST_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/BreezeODB/test_record.hxx"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/BreezeODB/test_record.hxx"
+    VERBATIM
+)
+add_executable(breeze_odb_test BreezeODB/odb_test.cpp "${BREEZE_ODB_TEST_DIR}/test_record-odb.cxx")
+target_include_directories(breeze_odb_test PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/BreezeODB" "${BREEZE_ODB_TEST_DIR}"
+)
+target_link_libraries(breeze_odb_test PRIVATE breeze_odb GTest::gtest_main)
+set_target_properties(breeze_odb_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test")
+
+
+# ---------- Elasticsearch 封装测试 ----------
+
+# 包含本地请求构造测试和需要 Elasticsearch 服务的增删改查测试。
+add_executable(breeze_elastic_test BreezeElastic/elastic_test.cpp)
+target_link_libraries(breeze_elastic_test PRIVATE breeze_elastic GTest::gtest_main)
+set_target_properties(breeze_elastic_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
+)
 
 # 使用 CTest 运行封装测试。
 enable_testing()
@@ -173,4 +180,6 @@ add_test(NAME breeze_fdfs_test COMMAND breeze_fdfs_test)
 set_tests_properties(breeze_fdfs_test PROPERTIES TIMEOUT 90)
 add_test(NAME breeze_odb_test COMMAND breeze_odb_test)
 set_tests_properties(breeze_odb_test PROPERTIES TIMEOUT 15)
+add_test(NAME breeze_elastic_test COMMAND breeze_elastic_test)
+set_tests_properties(breeze_elastic_test PROPERTIES TIMEOUT 60)
 

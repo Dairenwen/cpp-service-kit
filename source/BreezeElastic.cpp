@@ -251,6 +251,7 @@ namespace BreezeElastic
         if (term)
         {
             // 一个 term 查询只能指定一个字段；多个字段应放入 bool.must 数组。
+            // 这里使用创建时保存的字段名进行检查，避免调用方传入不同字段
             if (term->field() != field)
             {
                 throw std::invalid_argument("term 查询只能使用一个字段，请使用 bool.must 组合多个条件");
@@ -426,15 +427,15 @@ namespace BreezeElastic
     }
     Must::ptr Query::must()
     {
-        return this->qbool()->must();
+        return this->qbool()->must(); // 复用 bool.must 子节点
     }
     Should::ptr Query::should()
     {
-        return this->qbool()->should();
+        return this->qbool()->should(); // 复用 bool.should 子节点
     }
     MustNot::ptr Query::must_not()
     {
-        return this->qbool()->must_not();
+        return this->qbool()->must_not(); // 复用 bool.must_not 子节点
     }
 
     // 保存请求路径所需的信息，并构造各类操作对象。
@@ -464,7 +465,7 @@ namespace BreezeElastic
     }
     Tokenizer::ptr Indexer::tokenizer(const std::string &tokenizer_name)
     {
-        return this->settings()->analysis()->analyzer()->tokenizer(tokenizer_name);
+        return this->settings()->analysis()->analyzer()->tokenizer(tokenizer_name); // 创建或复用 tokenizer 节点
     }
     Mappings::ptr Indexer::mappings()
     {
@@ -481,14 +482,14 @@ namespace BreezeElastic
     }
     Field::ptr Indexer::field(const std::string &field_name)
     {
-        return this->mappings()->properties()->field(field_name);
+        return this->mappings()->properties()->field(field_name); // 创建或复用 field 节点
     }
 
     Inserter::Inserter(const std::string &index, const std::string &id) : Object(""), Request(index, "_doc", "_insert", id) {}
     Updater::Updater(const std::string &index, const std::string &id) : Object(""), Request(index, "_doc", "_update", id) {}
     Object::ptr Updater::doc()
     {
-        // ES 局部更新的字段需要放在请求正文的 doc 对象中。
+        // ES 局部更新的字段需要放在请求正文的 doc 对象中。、
         Object::ptr doc;
         doc = this->getElement<Object>("doc");
         if (doc)
@@ -515,11 +516,11 @@ namespace BreezeElastic
     }
     void Searcher::size(size_t count)
     {
-        this->add("size", count);
+        this->add("size", count); // 设置分页大小
     }
     void Searcher::from(size_t offset)
     {
-        this->add("from", offset);
+        this->add("from", offset); // 设置分页偏移量
     }
 
     // 将请求对象转为 elasticlient 调用，检查 HTTP 响应。
@@ -568,7 +569,7 @@ namespace BreezeElastic
         std::string index_type = upd.type();
         std::string doc_id = upd.id();
         std::string index_body = upd.to_string();
-        // POST 到更新接口，请求正文的 doc 包含需要更新的字段。
+        // POST 到更新接口，请求正文的 doc 包含需要更新的字段，这里只能使用通用接口，需要自己构造url
         std::string url = index_name + "/_update/" + doc_id;
         auto resp = _client->performRequest(elasticlient::Client::HTTPMethod::POST, url, index_body);
         if (resp.status_code < 200 || resp.status_code >= 300)
@@ -627,7 +628,8 @@ namespace BreezeElastic
             ERR("搜索数据,响应格式错误: {}/{}/{} - {}", index_name, index_type, index_body, resp.text);
             return std::optional<Json::Value>();
         }
-        // 零条命中也返回空数组，保证成功结果的类型一致。
+        // 将es返回的结果hits.hits中的每条命中的_source取出，组成一个数组返回给调用方，
+        // 如果没有命中则返回空数组，如果请求失败则返回空optional。
         Json::Value result(Json::arrayValue);
         int sz = (*json_resp)["hits"]["hits"].size();
         for (int i = 0; i < sz; ++i)

@@ -152,6 +152,7 @@ namespace BreezeElastic
         void dynamic(bool flag);
     };
 
+    // 下面都是查询条件内容节点，只需要继承Object即可
     // term 是单值精确查询；terms 是同一字段的多个精确值查询。
     class Term : public Object
     {
@@ -229,6 +230,7 @@ namespace BreezeElastic
         Object::ptr _sub;
     };
 
+    // 子节点按照名称进行复用，没有就进行创建
     class QObject : public Object
     {
     public:
@@ -243,7 +245,7 @@ namespace BreezeElastic
         Range::ptr range(const std::string &field); // 创建一个range子对象
     };
 
-    // 查询数组每次添加独立条件，适合组合多个同类型或不同字段的查询。
+    // 每次追加新的条件，必须创建一个独立的对象，避免同一字段被覆盖。
     class QArray : public Array
     {
     public:
@@ -257,6 +259,7 @@ namespace BreezeElastic
     };
 
     // must：全部满足；should：可选匹配；must_not：必须不满足。
+    // must/should/must_not 都是数组，允许添加多个条件，按顺序追加，并且允许多个相同类型、不同字段，所以继承自 QArray而不是 QObject。
     class Must : public QArray
     {
     public:
@@ -276,7 +279,8 @@ namespace BreezeElastic
         MustNot();
     };
 
-    // bool 组合多个查询；minimum_should_match 设置 should 最少匹配数。
+    // bool 组合多个查询；minimum_should_match 设置 should 最少匹配数
+    // 需要按名称复用子节点，所以需要继承 QObject 而不是 QArray
     class QBool : public QObject
     {
     public:
@@ -301,15 +305,15 @@ namespace BreezeElastic
         MustNot::ptr must_not();
     };
 
-    // 保存操作需要的索引名、类型、操作名和文档 ID。
+    // 保存操作需要的索引名、类型、操作名和文档 ID。//POST http://localhost:9200/users/_doc/1001
     class Request
     {
     public:
         Request(const std::string &index, const std::string &type, const std::string &op, const std::string &id);
-        void set_index(const std::string &index);
-        void set_type(const std::string &type);
-        void set_op(const std::string &op);
-        void set_id(const std::string &id);
+        void set_index(const std::string &index); // 设置索引名
+        void set_type(const std::string &type);   // 设置类型名
+        void set_op(const std::string &op);       // 设置操作名
+        void set_id(const std::string &id);       // 设置文档 ID
         const std::string &index() const;
         const std::string &type() const;
         const std::string &op() const;
@@ -328,13 +332,13 @@ namespace BreezeElastic
     public:
         using ptr = std::shared_ptr<Indexer>;
         Indexer(const std::string &index);
-        Settings::ptr settings();
-        Tokenizer::ptr tokenizer(const std::string &tokenizer_name);
-        Mappings::ptr mappings();
-        Field::ptr field(const std::string &field_name);
+        Settings::ptr settings();                                    // 创建或复用 settings 节点
+        Tokenizer::ptr tokenizer(const std::string &tokenizer_name); // 创建或复用 tokenizer 节点
+        Mappings::ptr mappings();                                    // 创建或复用 mappings 节点
+        Field::ptr field(const std::string &field_name);             // 创建或复用 field 节点
     };
 
-    // Inserter 使用 add/append 填充待插入文档。
+    // Inserter 使用 add/append 填充待插入文档，不需要成员函数，直接使用add/append即可
     class Inserter : public Object, public Request
     {
     public:
@@ -352,12 +356,12 @@ namespace BreezeElastic
         template <typename T>
         void add(const std::string &key, const T &val)
         {
-            this->doc()->add(key, val);
+            this->doc()->add(key, val); // 直接复用已有的add函数
         }
         template <typename T>
         void append(const std::string &key, const T &val)
         {
-            this->doc()->append(key, val);
+            this->doc()->append(key, val); // 复用append进行追加
         }
     };
     // Deleter 按索引名和文档 ID 指定要删除的文档。
@@ -371,6 +375,7 @@ namespace BreezeElastic
     class Searcher : public Object, public Request
     {
     public:
+        using ptr = std::shared_ptr<Searcher>;
         Searcher(const std::string &index);
         Query::ptr query();
         void size(size_t count);
