@@ -163,6 +163,15 @@ set_target_properties(breeze_elastic_test PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
 )
 
+# ---------- 邮件验证码封装测试 ----------
+add_executable(breeze_code_test BreezeCode/code_test.cpp)
+target_link_libraries(breeze_code_test PRIVATE breeze_code GTest::gtest)
+# 使用源码目录中的模板和附件，运行时不受当前工作目录影响。
+target_compile_definitions(breeze_code_test PRIVATE BREEZE_MAIL_TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}/BreezeCode")
+set_target_properties(breeze_code_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
+)
+
 # 使用 CTest 运行封装测试。
 enable_testing()
 add_test(NAME breeze_rpc_test COMMAND breeze_rpc_test)
@@ -182,4 +191,6 @@ add_test(NAME breeze_odb_test COMMAND breeze_odb_test)
 set_tests_properties(breeze_odb_test PROPERTIES TIMEOUT 15)
 add_test(NAME breeze_elastic_test COMMAND breeze_elastic_test)
 set_tests_properties(breeze_elastic_test PROPERTIES TIMEOUT 60)
+add_test(NAME breeze_code_test COMMAND breeze_code_test)
+set_tests_properties(breeze_code_test PROPERTIES TIMEOUT 30)
 

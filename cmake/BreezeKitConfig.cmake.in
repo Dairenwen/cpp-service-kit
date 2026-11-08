@@ -1,0 +1,21 @@
+# CMake 配置安装包时展开此占位符，提供安装前缀和组件检查函数。
+@PACKAGE_INIT@
+
+# 使用方指定 COMPONENTS 时，只加载所选模块及其依赖。
+# 没有指定 COMPONENTS 时加载全部组件；指定后按传入列表加载。
+if(NOT BreezeKit_FIND_COMPONENTS)
+    set(BreezeKit_FIND_COMPONENTS log util rpc etcd mq fdfs redis odb elastic code trans)
+endif()
+# 组件入口负责加载公共模块、查找第三方库并导入 BreezeKit:: 目标。
+# OPTIONAL 允许记录未知组件的状态，再由 CMake 统一检查必需组件。
+foreach(component IN LISTS BreezeKit_FIND_COMPONENTS)
+    include("${CMAKE_CURRENT_LIST_DIR}/components/${component}.cmake" OPTIONAL RESULT_VARIABLE component_file)
+    # include 找到组件入口时记录为 FOUND，供 check_required_components 使用。
+    if(component_file)
+        set(BreezeKit_${component}_FOUND TRUE)
+    else()
+        set(BreezeKit_${component}_FOUND FALSE)
+    endif()
+endforeach()
+# 必需组件缺失时将 BreezeKit 标记为未找到，find_package(REQUIRED) 会报告错误。
+check_required_components(BreezeKit)

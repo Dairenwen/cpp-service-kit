@@ -388,3 +388,11 @@ target_include_directories(elasticsearch_client PRIVATE "${ELASTICLIENT_INCLUDE_
 target_link_libraries(elasticsearch_client PRIVATE
     "${ELASTICLIENT_LIBRARY}" "${CPR_LIBRARY}" JsonCpp::JsonCpp Threads::Threads
 )
+
+# ---------- libcurl：通过 SMTP 发送 HTML 邮件 ----------
+find_package(CURL REQUIRED)
+add_executable(mail_example mail/mail.cc)
+target_link_libraries(mail_example PRIVATE CURL::libcurl)
+# 将邮件模板放到示例程序目录；模板修改后重新构建即可更新副本。
+configure_file(mail/mail.html "${CPP_KIT_BUILD_DIR}/example/mail.html" COPYONLY)
+target_compile_definitions(mail_example PRIVATE MAIL_TEMPLATE_PATH="${CPP_KIT_BUILD_DIR}/example/mail.html")
