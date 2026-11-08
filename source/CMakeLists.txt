@@ -9,8 +9,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 endif()
 
 # 依赖同时供安装后的组件配置复用，路径由各自的机器查找。
-# 此处在构建环境查找全部模块的依赖。安装后的组件也复用这些脚本，
-# 在使用方环境重新查找依赖，避免把构建机器上的库路径写进发布包。
+# 此处在构建环境查找全部模块的依赖。安装后的组件也复用这些脚本，在使用方环境重新查找依赖，避免把构建机器上的库路径写进发布包。
 include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake/dependencies/log.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake/dependencies/util.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake/dependencies/rpc.cmake")

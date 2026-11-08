@@ -16,7 +16,7 @@ TEST(BreezeCodeTest, SendRealMail)
 
     Breezecode::mail_settings settings;
     settings.username = "3484725023@qq.com";                           // QQ 邮箱登录账号。
-    settings.password = "lshcqpcfdmilchjj";                            // 该账号生成的客户端授权码。
+    settings.password = "lshcqpcfdmilxxxx";                            // 该账号生成的客户端授权码。
     settings.url = "smtps://smtp.qq.com:465";                          // QQ 邮箱加密 SMTP 服务。
     settings.from = "3484725023@qq.com";                               // 发件人使用登录邮箱。
     settings.login_options = "AUTH=LOGIN";                             // 当前 QQ 邮箱使用 LOGIN 认证。

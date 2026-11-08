@@ -86,7 +86,7 @@ int main()
         std::cout << curl_easy_strerror(ret) << std::endl;
         return -1;
     }
-    ret = curl_easy_setopt(curl, CURLOPT_PASSWORD, "lshcqpcfdmilchjj"); // 设置授权码（非邮箱密码）
+    ret = curl_easy_setopt(curl, CURLOPT_PASSWORD, "lshcqpcfdmilcxxxx"); // 设置授权码（非邮箱密码）
     if (ret != CURLE_OK)
     {
         std::cout << "curl_easy_setopt CURLOPT_PASSWORD failed: ";

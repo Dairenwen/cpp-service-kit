@@ -27,8 +27,7 @@ if(BREEZE_BUILD_TESTS)
     add_subdirectory(test "${CMAKE_BINARY_DIR}/CMakeFiles/test_build")
 endif()
 
-# 生成供 find_package 使用的配置和版本文件。
-# 配置文件相对于安装前缀放在 lib/cmake/BreezeKit（具体 lib 目录由平台决定）。
+# 生成供 find_package 使用的配置和版本文件。配置文件相对于安装前缀放在 lib/cmake/BreezeKit（具体 lib 目录由平台决定）。
 set(BREEZE_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/BreezeKit")
 # 将 .in 模板中的 @PACKAGE_INIT@ 展开，生成适合安装和移动的包配置。
 configure_package_config_file(cmake/BreezeKitConfig.cmake.in
