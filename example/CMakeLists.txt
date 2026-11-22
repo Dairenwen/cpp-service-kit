@@ -396,3 +396,16 @@ target_link_libraries(mail_example PRIVATE CURL::libcurl)
 # 将邮件模板放到示例程序目录；模板修改后重新构建即可更新副本。
 configure_file(mail/mail.html "${CPP_KIT_BUILD_DIR}/example/mail.html" COPYONLY)
 target_compile_definitions(mail_example PRIVATE MAIL_TEMPLATE_PATH="${CPP_KIT_BUILD_DIR}/example/mail.html")
+
+# ---------- OpenXLSX：创建和解析学生信息表 ----------
+
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../OpenXLSX/OpenXLSX"
+                 "${CMAKE_CURRENT_BINARY_DIR}/openxlsx" EXCLUDE_FROM_ALL)
+
+
+# 两个程序均在当前工作目录读写 studentInfo.xlsx。
+add_executable(openxlsx_create openxlsx/create.cc)
+target_link_libraries(openxlsx_create PRIVATE OpenXLSX::OpenXLSX)
+
+add_executable(openxlsx_parse openxlsx/parse.cc)
+target_link_libraries(openxlsx_parse PRIVATE OpenXLSX::OpenXLSX)

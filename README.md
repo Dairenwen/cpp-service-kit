@@ -157,7 +157,7 @@ BreezeKit 提供 C++17 服务开发常用模块。发布包适用于 Ubuntu 22.0
 
 ## 邮件
 
-- 组件 `code`，头文件 `<BreezeKit/BreezeCode.hpp>`，依赖 libcurl 和 spdlog。SMTP 用户名和授权码通过环境变量提供，HTML 模板通过 `{{code}}` 接收验证码。
+- 组件 `code`，头文件 `<BreezeKit/BreezeCode.hpp>`，依赖 libcurl 和 spdlog。验证码邮件和普通邮件共用 `mail_settings` 中的 SMTP 配置。
 
   ```cpp
   #include <cstdlib>
@@ -167,13 +167,39 @@ BreezeKit 提供 C++17 服务开发常用模块。发布包适用于 Ubuntu 22.0
   settings.url = "smtps://smtp.qq.com:465";
   settings.from = settings.username;
   settings.login_options = "AUTH=LOGIN";
-  settings.html_path = "mail.html";
+  settings.html_path = "mail.html";// 填写 HTML 模板路径，需要有 {{code}} 占位符
   settings.attachment_path = "attachment.png"; // 需要附件时填写路径
   Breezecode::MailClient mail(settings);
   bool sent = mail.send("recipient@example.com", "5678");
   ```
 
   模板示例：`<html><body>验证码：<b>{{code}}</b></body></html>`。收件地址、模板路径和附件路径由调用方提供。
+
+  普通邮件使用 `sendMail`，由调用方传入主题、HTML 正文和附件。每个附件包含文件名、原始字节和 MIME 类型，类型留空时使用 `application/octet-stream`。
+
+  ```cpp
+  Breezecode::MailMessage report{
+      "recipient@example.com", "分析报告", "<p>请查收附件</p>",
+      {{"report.csv", "name,value\nAlice,42\n", "text/csv"}}
+  };
+  bool report_sent = mail.sendMail(report);
+  ```
+
+  构造时传入 `MailQueueOptions` 可启用同一个进程内的后台队列。通过异步方法提交任务，调用方可以稍后读取各自的发送结果。
+
+  ```cpp
+  Breezecode::MailClient queued_mail(settings, Breezecode::MailQueueOptions{});
+  auto code_result = queued_mail.sendAsync("recipient@example.com", "123456");
+  auto report_result = queued_mail.sendMailAsync(report);
+  bool code_sent = code_result.get();
+  bool queued_report_sent = report_result.get();
+  ```
+**注意：**
+1. 单个工作线程按入队顺序发送。
+2. 默认限额为 32 个任务和 512 MiB 邮件负载，包含正在发送的任务。
+3. 每个任务默认有 30 秒预算，包含排队和 SMTP 投递时间。
+4. 队列未启用、达到限额、任务过期或 SMTP 失败时，异步结果为 `false`。
+5. 最后一个共享队列的客户端销毁时，会等待已接收的任务结束。
 
 ## 音视频转码
 

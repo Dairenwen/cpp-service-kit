@@ -88,7 +88,7 @@ namespace
     void SetUp() override
     {
       const std::string url = "http://elastic:123456@dev-elasticsearch:9200/"; // 容器中的 ES 连接地址和认证信息。
-      // client_ = BreezeElastic::ESClientFactory::create({url});
+      client_ = BreezeElastic::ESClientFactory::create({url});
       raw_client_ = std::make_unique<elasticlient::Client>(std::vector<std::string>{url});
 
       // 每次运行使用独立索引，只清理本次成功创建的索引

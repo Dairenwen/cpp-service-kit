@@ -111,14 +111,14 @@ target_include_directories(breeze_elastic PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(breeze_elastic PUBLIC breeze_log breeze_util BreezeDep::elasticlient BreezeDep::cpr)
 
-# 邮件模块使用 libcurl 和公共日志，发送验证码邮件。
+# 邮件模块使用 libcurl 和公共日志，后台队列依赖线程库。
 add_library(breeze_code STATIC BreezeCode.cpp)
 set_target_properties(breeze_code PROPERTIES EXPORT_NAME code)
 target_compile_features(breeze_code PUBLIC cxx_std_17)
 target_include_directories(breeze_code PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-target_link_libraries(breeze_code PUBLIC breeze_log CURL::libcurl)
+target_link_libraries(breeze_code PUBLIC breeze_log CURL::libcurl Threads::Threads)
 
 # 转码模块复用日志和工具，并连接 FFmpeg 的封装、编解码和工具库。
 add_library(breeze_trans STATIC BreezeTrans.cpp)

@@ -163,9 +163,9 @@ set_target_properties(breeze_elastic_test PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CPP_KIT_BUILD_DIR}/test"
 )
 
-# ---------- 邮件验证码封装测试 ----------
+# ---------- 邮件发送封装测试 ----------
 add_executable(breeze_code_test BreezeCode/code_test.cpp)
-target_link_libraries(breeze_code_test PRIVATE breeze_code GTest::gtest)
+target_link_libraries(breeze_code_test PRIVATE breeze_code GTest::gtest_main)
 # 使用源码目录中的模板和附件，运行时不受当前工作目录影响。
 target_compile_definitions(breeze_code_test PRIVATE BREEZE_MAIL_TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}/BreezeCode")
 set_target_properties(breeze_code_test PROPERTIES

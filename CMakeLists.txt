@@ -1,6 +1,6 @@
 # 声明项目使用的 CMake 最低版本
 cmake_minimum_required(VERSION 3.20)
-project(BreezeKit VERSION 0.1.0 LANGUAGES CXX)
+project(BreezeKit VERSION 0.2.0 LANGUAGES CXX)
 
 # 示例和测试按需构建；发布包只包含库和公开文件
 option(BREEZE_BUILD_EXAMPLES "构建示例程序" OFF)
